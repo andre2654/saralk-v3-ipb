@@ -2,8 +2,9 @@ import { GameBlockTypeEnum } from '@/enums/game';
 import { ActionMoveEnum } from '@/enums/actions';
 import type { IBlock, IBoard, IPlayer } from '@/types/game';
 
-export function generatePlayer(): IPlayer {
+export function generatePlayer(lastPlayerId: number): IPlayer {
   return {
+    id: lastPlayerId++,
     position: {
       x: 0,
       y: 0

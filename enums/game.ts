@@ -6,5 +6,5 @@ export enum GameBlockTypeEnum {
   SANDY_1 = 'sandy-1',
   SANDY_2 = 'sandy-2',
   SWAMPY_1 = 'swampy-1',
-  SWAMPY_2 = 'swampy-2',
+  SWAMPY_2 = 'swampy-2'
 }

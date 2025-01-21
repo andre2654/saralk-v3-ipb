@@ -7,12 +7,13 @@
   >
     <div v-if="points" class="relative">
       <span
-        class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-xl text-white"
+        class="absolute left-1/2 top-1/2 z-10 ms-[2.5px] mt-[2px] -translate-x-1/2 -translate-y-1/2 font-sk-font-pixel text-sm text-[#FFEAB4]"
         >{{ points }}</span
       >
       <img
         class="image-pixelated pointer-events-none select-none"
         src="/assets/images/bonus-ring-object.png"
+        width="45"
         alt="Bonus object"
       />
     </div>

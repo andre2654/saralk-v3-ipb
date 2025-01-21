@@ -2,9 +2,7 @@
   <div
     v-dragscroll
     id="game-board"
-    class="no-scrollbar relative flex h-full w-full flex-1 cursor-move flex-col overflow-scroll"
-    @scroll="handleScroll"
-    :style="{ boxShadow: boxShadowStyle }"
+    class="no-scrollbar relative flex h-full w-full flex-1 cursor-move flex-col overflow-scroll px-[200px] py-[60px]"
   >
     <MoleculesGameNavesCharacter
       v-for="userId in characterStore.getAllPlayers()"
@@ -30,37 +28,4 @@
 
 <script setup lang="ts">
 const characterStore = useCharacterStore()
-
-const boxShadowStyle = ref('none')
-const handleScroll = (event: Event) => {
-  const scrollContainer: HTMLElement | null = event.target as HTMLElement
-  if (!scrollContainer) return
-  const {
-    scrollLeft,
-    scrollWidth,
-    clientWidth,
-    scrollTop,
-    scrollHeight,
-    clientHeight,
-  } = scrollContainer
-  const maxScrollLeft = scrollWidth - clientWidth
-  const maxScrollTop = scrollHeight - clientHeight
-
-  const shadows = []
-
-  if (scrollLeft > 0) {
-    shadows.push('inset 20px 0 10px -10px rgba(0, 0, 0, 0.5)')
-  }
-  if (scrollLeft < maxScrollLeft) {
-    shadows.push('inset -20px 0 10px -10px rgba(0, 0, 0, 0.5)')
-  }
-  if (scrollTop > 0) {
-    shadows.push('inset 0 20px 10px -10px rgba(0, 0, 0, 0.5)')
-  }
-  if (scrollTop < maxScrollTop) {
-    shadows.push('inset 0 -20px 10px -10px rgba(0, 0, 0, 0.5)')
-  }
-
-  boxShadowStyle.value = shadows.join(', ')
-}
 </script>

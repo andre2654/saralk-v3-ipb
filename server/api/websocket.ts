@@ -43,12 +43,15 @@ export default defineWebSocketHandler({
       if (!DB[roomId]) {
         const game: IGame = {
           players: {},
+          lastPlayerId: 0,
           board: generateBoard(BOARD_SIZE)
         }
-        game.players[userId] = generatePlayer()
+        game.players[userId] = generatePlayer(game.lastPlayerId)
         DB[roomId] = game;
+        DB[roomId].lastPlayerId += 1
       } else {
-        DB[roomId].players[userId] = generatePlayer()
+        DB[roomId].players[userId] = generatePlayer(DB[roomId].lastPlayerId)
+        DB[roomId].lastPlayerId += 1
       }
 
       console.log(`Peer conectado à sala: ${roomId}`);
@@ -126,7 +129,7 @@ export default defineWebSocketHandler({
         return;
       }
 
-      var messageText = message.text() as ActionMoveEnum;
+      const messageText = message.text() as ActionMoveEnum;
       console.log(`Mensagem recebida: ${messageText}`);
 
       const player = DB[roomId].players[userId];
@@ -159,7 +162,7 @@ export default defineWebSocketHandler({
         player.movementTimeout = new Date().getTime()
       }
 
-      var pointsGetted = 0
+      let pointsGetted = 0
 
       if ([ActionMoveEnum.LEFT, ActionMoveEnum.RIGHT, ActionMoveEnum.TOP, ActionMoveEnum.DOWN].includes(messageText)) {
         const adjacentBlock = getAdjacentBlock(board, player.position.x, player.position.y, messageText)

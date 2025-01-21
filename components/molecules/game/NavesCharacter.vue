@@ -8,18 +8,20 @@
     :style="containerStyle"
   >
     <div
-      class="group absolute -top-[40px] left-[60px] flex min-w-max items-center gap-2"
+      class="group absolute -left-[15px] -top-[45px] flex min-w-max items-center gap-2"
     >
-      <IconInfo
-        class="h-10 w-10"
-        :class="[itsMe ? 'cursor-help' : 'cursor-not-allowed']"
-      />
       <AtomsPixelatedBox
-        class="flex items-center gap-3 border-sk-color-gold px-5 pb-[5px] pt-[8px] text-xs opacity-0"
+        class="border-sk-color-gold px-3 pb-[5px] pt-[8px] text-xs text-sk-color-gold"
+        :class="[itsMe ? 'cursor-help' : 'cursor-not-allowed']"
+      >
+        Usuário {{ character.id }}
+      </AtomsPixelatedBox>
+      <AtomsPixelatedBox
+        class="items-center gap-3 border-sk-color-gold px-5 pb-[5px] pt-[8px] text-xs"
         :class="{
-          'opacity-100': showPointsBar,
-          'opacity-0': !showPointsBar,
-          'transition-opacity group-hover:opacity-100': itsMe,
+          flex: showPointsBar,
+          hidden: !showPointsBar,
+          'group-hover:flex': itsMe,
         }"
       >
         <span class="text-[#EEE5E0]"> {{ character.points }} pontos </span>
@@ -44,7 +46,8 @@
 </template>
 
 <script setup lang="ts">
-import IconInfo from '@/public/assets/icons/icon-info.svg'
+import { ActionMoveEnum } from '@/enums/actions'
+import type { IPlayer } from '@/types/game'
 
 const characterStore = useCharacterStore()
 
@@ -56,14 +59,19 @@ const props = defineProps({
   },
 })
 
-const character = computed(() => {
+const character = computed<IPlayer>(() => {
   if (!characterStore.game.players[props.userId]) {
     return {
-      position: { x: 0, y: 0 },
-      direction: 'right',
-      inMovement: false,
+      id: 0,
+      position: {
+        x: 0,
+        y: 0,
+      },
       points: 0,
       iteractions: 0,
+      direction: ActionMoveEnum.RIGHT,
+      inMovement: false,
+      movementTimeout: null,
     }
   }
   return characterStore.game.players[props.userId]
@@ -74,8 +82,8 @@ const itsMe = computed(() => characterStore.me === props.userId)
 const skHeightBlock = 90
 
 const containerStyle = computed(() => ({
-  left: `calc(8px + (${character.value.position.x} * ${skHeightBlock}px))`,
-  top: `calc(-5px + (${character.value.position.y} * ${skHeightBlock}px))`,
+  left: `calc(208px + (${character.value.position.x} * ${skHeightBlock}px))`,
+  top: `calc(45px + (${character.value.position.y} * ${skHeightBlock}px))`,
   transition: '0.3s ease-in-out',
 }))
 
@@ -114,20 +122,35 @@ const characterStyle = computed(() => {
   return style
 })
 
+let isScrolling = false
+
 watch(
   () => [character.value.position.x, character.value.position.y],
   () => {
+    if (!itsMe.value) return // Só segue o personagem do próprio usuário
+
     const characterElement = document.getElementById(
       `character-container-${characterStore.me}`
     )
-    if (document && characterStore.me && characterElement) {
-      setTimeout(() => {
+
+    if (characterElement && !isScrolling) {
+      isScrolling = true
+
+      const followScroll = () => {
         characterElement.scrollIntoView({
-          behavior: 'smooth',
           block: 'center',
           inline: 'center',
+          behavior: 'auto',
         })
-      }, 500)
+
+        if (character.value.inMovement) {
+          requestAnimationFrame(followScroll)
+        } else {
+          isScrolling = false
+        }
+      }
+
+      requestAnimationFrame(followScroll)
     }
   }
 )

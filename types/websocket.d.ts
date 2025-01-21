@@ -1,5 +1,5 @@
-import { TypeResponseEnum, TypeInteractionEnum } from '@/enums/websocket';
-import { ActionMoveEnum } from '@/enums/actions';
+import type { TypeResponseEnum, TypeInteractionEnum } from '@/enums/websocket';
+import type { ActionMoveEnum } from '@/enums/actions';
 import type { IGame, IPlayer } from '@/types/game';
 
 export interface IInteractionGetPoints {

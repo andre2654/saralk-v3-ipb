@@ -1,6 +1,7 @@
-import { GameBlockTypeEnum } from '@/enums/game';
+import type { GameBlockTypeEnum } from '@/enums/game';
 
 export interface IPlayer {
+  id: number;
   position: {
     x: number;
     y: number;
@@ -24,6 +25,7 @@ export interface IGame {
   players: {
     [key: string]: IPlayer;
   },
+  lastPlayerId: number;
   board: IBoard;
 }
 
