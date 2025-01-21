@@ -1,75 +1,70 @@
+import type { IPlayer, IGame } from '@/types/game';
+import type { IInteractionGetPoints } from '@/types/websocket';
 import { ActionMoveEnum } from '@/enums/actions'
 
 interface IState {
-  position: {
-    x: number
-    y: number
-  }
-  direction: ActionMoveEnum
-  inMovement: boolean
-  movementTimeoutId: number | null
+  me: string
+  game: IGame
 }
 
 export const useCharacterStore = defineStore('character', {
   state: (): IState => {
-    return {
-      position: {
-        x: 0,
-        y: 0,
-      },
-      direction: ActionMoveEnum.RIGHT,
-      inMovement: false,
-      movementTimeoutId: null,
-    }
+    return {} as IState
   },
   actions: {
-    move(direction: ActionMoveEnum) {
-      this.direction = direction
+    createGame(game: IGame) {
+      this.game = game
+    },
+    addPlayer(userId: string, player: IPlayer) {
+      this.game.players[userId] = player
+    },
+    addMe(userId: string, player: IPlayer) {
+      this.me = userId
+      this.game.players[userId] = player
+    },
+    move(userId: string, direction: ActionMoveEnum, data: IPlayer, interaction?: IInteractionGetPoints) {
+      const player = this.game.players[userId]
 
-      if (this.inMovement) {
+      player.direction = direction
+
+      if (player.inMovement) {
         return
+      } else {
+        player.inMovement = true
       }
 
-      this.inMovement = true
 
-      if (this.movementTimeoutId) {
-        clearTimeout(this.movementTimeoutId)
+      if (player.movementTimeout) {
+        clearTimeout(player.movementTimeout)
       }
 
-      this.movementTimeoutId = window.setTimeout(() => {
-        this.inMovement = false
-        this.movementTimeoutId = null
+      player.movementTimeout = window.setTimeout(() => {
+        player.inMovement = false
+        player.movementTimeout = null
       }, 350)
 
-      // Move o personagem
-      switch (direction) {
-        case ActionMoveEnum.LEFT:
-          this.position.x -= 1
-          break
-        case ActionMoveEnum.RIGHT:
-          this.position.x += 1
-          break
-        case ActionMoveEnum.TOP:
-          this.position.y -= 1
-          break
-        case ActionMoveEnum.DOWN:
-          this.position.y += 1
-          break
-        default:
-          break
+      this.game.players[userId].position = data.position
+
+      player.iteractions = data.iteractions
+
+      if (interaction) {
+        player.points = data.points
+        this.getPointFromBlock(data.position.x, data.position.y)
       }
     },
-    moveLeft() {
-      this.move(ActionMoveEnum.LEFT)
+    removePlayer(userId: string) {
+      delete this.game.players[userId]
     },
-    moveRight() {
-      this.move(ActionMoveEnum.RIGHT)
+    getPointFromBlock(x: number, y: number) {
+      const block = this.game.board[y][x]
+      block.points = 0
     },
-    moveUp() {
-      this.move(ActionMoveEnum.TOP)
-    },
-    moveDown() {
-      this.move(ActionMoveEnum.DOWN)
-    },
+    getAllPlayers() {
+      if (!this.game?.players) {
+        return []
+      }
+
+      return Object.keys(this.game.players)
+    }
   },
 })

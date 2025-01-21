@@ -12,6 +12,12 @@ export default defineNuxtConfig({
     }
   },
 
+  ssr: false,
+
+  plugins: [
+    { src: '@/plugins/v-dragscroll.ts', ssr: false }
+  ],
+
   css: ['@/assets/css/font.css', '@/assets/css/utilities.css'],
 
   vite: {
@@ -46,5 +52,9 @@ export default defineNuxtConfig({
     defaultLocale: 'pt',
     strategy: 'no_prefix',
     detectBrowserLanguage: false,
-  }
+  },
+
+  imports: {
+    dirs: ['services'],
+  },
 })

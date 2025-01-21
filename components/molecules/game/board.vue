@@ -1,42 +1,35 @@
 <template>
   <div
-    class="no-scrollbar relative flex h-full w-full flex-1 flex-col overflow-auto"
+    v-dragscroll
+    id="game-board"
+    class="no-scrollbar relative flex h-full w-full flex-1 cursor-move flex-col overflow-scroll"
     @scroll="handleScroll"
     :style="{ boxShadow: boxShadowStyle }"
   >
-    <MoleculesGameNavesCharacter />
-    <div class="-z-10 flex min-w-max" v-for="i in 30" :key="i">
+    <MoleculesGameNavesCharacter
+      v-for="userId in characterStore.getAllPlayers()"
+      :key="userId"
+      :userId="userId"
+    />
+    <div
+      class="pointer-events-none -z-10 flex min-w-max select-none"
+      v-for="(boardX, yIndex) in characterStore.game?.board"
+      :key="yIndex"
+    >
       <AtomsGameGroundBlock
-        v-for="(block, index) in blocks"
-        :key="`${block.groundType}-${index}-${i}`"
-        :groundType="block.groundType"
-        :blocked="block.blocked"
+        v-for="({ type, isBlocked, points }, xIndex) in boardX"
+        :key="xIndex"
+        :type="type"
+        :blocked="isBlocked"
+        :position="{ x: xIndex, y: yIndex }"
+        :points="points"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { GameBlockTypeEnum } from '@/enums/game'
-
-const blocks = ref([
-  { groundType: GameBlockTypeEnum.GRASSY_1, blocked: false },
-  { groundType: GameBlockTypeEnum.GRASSY_1, blocked: true },
-  { groundType: GameBlockTypeEnum.GRASSY_2, blocked: false },
-  { groundType: GameBlockTypeEnum.GRASSY_2, blocked: true },
-  { groundType: GameBlockTypeEnum.ROCKY_1, blocked: false },
-  { groundType: GameBlockTypeEnum.ROCKY_1, blocked: true },
-  { groundType: GameBlockTypeEnum.ROCKY_2, blocked: false },
-  { groundType: GameBlockTypeEnum.ROCKY_2, blocked: true },
-  { groundType: GameBlockTypeEnum.SANDY_1, blocked: false },
-  { groundType: GameBlockTypeEnum.SANDY_1, blocked: true },
-  { groundType: GameBlockTypeEnum.SANDY_2, blocked: false },
-  { groundType: GameBlockTypeEnum.SANDY_2, blocked: true },
-  { groundType: GameBlockTypeEnum.SWAMPY_1, blocked: false },
-  { groundType: GameBlockTypeEnum.SWAMPY_1, blocked: true },
-  { groundType: GameBlockTypeEnum.SWAMPY_2, blocked: false },
-  { groundType: GameBlockTypeEnum.SWAMPY_2, blocked: true },
-])
+const characterStore = useCharacterStore()
 
 const boxShadowStyle = ref('none')
 const handleScroll = (event: Event) => {

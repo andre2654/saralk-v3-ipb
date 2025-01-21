@@ -13,6 +13,7 @@ export default {
       colors: {
         'sk-color': {
           primary: '#2ECDFF',
+          gold: '#F3DB00',
           bg: '#1F1F1F',
           border: '#A6A6A6',
           warning: '#FB754B',

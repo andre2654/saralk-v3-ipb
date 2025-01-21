@@ -1,13 +1,13 @@
 import { ActionMoveEnum } from '@/enums/actions';
-import { v4 as uuidv4 } from 'uuid';
+import { TypeResponseEnum, TypeInteractionEnum } from '@/enums/websocket';
+import type { IWebsocketResponse, IInteractionGetPoints } from '@/types/websocket';
+import type { IAllGames, IGame } from '@/types/game';
 import type { Peer } from 'crossws';
+import { generatePlayer, generateBoard, getAdjacentBlock } from '@/server/utils/helpers'
 
-const validMoves = [
-  ActionMoveEnum.TOP,
-  ActionMoveEnum.LEFT,
-  ActionMoveEnum.RIGHT,
-  ActionMoveEnum.DOWN,
-];
+const BOARD_SIZE = 20;
+
+const DB: IAllGames = {}
 
 interface PeerWithRoom extends Peer {
   room: string;
@@ -27,18 +27,57 @@ export default defineWebSocketHandler({
       }
 
       const parsedUrl = new URL(url);
-      const room = parsedUrl.searchParams.get('room');
+      const roomId = parsedUrl.searchParams.get('room');
 
-      if (!room) {
+      if (!roomId) {
         console.error('ID da sala não especificado na URL');
         peerWithRoom.close();
         return;
       }
 
-      peerWithRoom.room = room;
+      const userId = peerWithRoom.id;
+      peerWithRoom.room = roomId;
 
-      peerWithRoom.subscribe(room);
-      console.log(`Peer conectado à sala: ${room}`);
+      peerWithRoom.subscribe(roomId);
+
+      if (!DB[roomId]) {
+        const game: IGame = {
+          players: {},
+          board: generateBoard(BOARD_SIZE)
+        }
+        game.players[userId] = generatePlayer()
+        DB[roomId] = game;
+      } else {
+        DB[roomId].players[userId] = generatePlayer()
+      }
+
+      console.log(`Peer conectado à sala: ${roomId}`);
+
+      const responseYourPlayer: IWebsocketResponse = {
+        type: TypeResponseEnum.YOUR_PLAYER,
+        userId: userId,
+        data: DB[roomId].players[userId],
+      };
+
+      const responseNewPlayer: IWebsocketResponse = {
+        type: TypeResponseEnum.NEW_PLAYER,
+        userId: userId,
+        data: DB[roomId].players[userId],
+      };
+
+      const responseGameInfo: IWebsocketResponse = {
+        type: TypeResponseEnum.GAME_INFO,
+        data: DB[roomId],
+      };
+
+      // Envia a mensagem de volta para o peer que enviou
+      peerWithRoom.send(JSON.stringify(responseGameInfo));
+
+      // Envia a mensagem para todos os peers na sala
+      peerWithRoom.publish(peerWithRoom.room, JSON.stringify(responseNewPlayer));
+
+      // Envia a mensagem de volta para o peer que enviou
+      peerWithRoom.send(JSON.stringify(responseYourPlayer));
     } catch (error) {
       console.error('Erro ao processar conexão:', error);
       peer.close();
@@ -46,37 +85,119 @@ export default defineWebSocketHandler({
   },
 
   close(peer) {
-    console.log(`Conexão fechada (Peer ID: ${peer.id})`);
+    const userId = peer.id;
+
+    const roomId = (peer as PeerWithRoom)?.room;
+    if (!roomId) {
+      console.error('Nenhuma sala associada a este peer');
+      return;
+    } else if (!DB[roomId]) {
+      console.error('Sala não encontrada');
+      return;
+    }
+
+    delete DB[roomId].players[userId];
+    const responseRemovePlayer: IWebsocketResponse = {
+      type: TypeResponseEnum.REMOVE_PLAYER,
+      userId: userId
+    };
+
+    // Envia a mensagem para todos os peers na sala
+    peer.publish(roomId, JSON.stringify(responseRemovePlayer));
+
+    console.log(`Conexão fechada (Peer ID: ${userId})`);
   },
 
   error(peer, error) {
-    console.error(`Erro no peer (ID: ${peer.id}):`, error);
+    const userId = peer.id;
+
+    console.error(`Erro no peer (ID: ${userId}):`, error);
   },
 
   message(peer, message) {
     try {
       const peerWithRoom = peer as PeerWithRoom;
+      const roomId = peerWithRoom?.room;
+      const userId = peerWithRoom?.id;
 
-      if (!peerWithRoom?.room) {
+      if (!roomId) {
         console.error('Nenhuma sala associada a este peer');
         peerWithRoom.close();
         return;
       }
 
-      const messageText = message.text() as ActionMoveEnum;
+      var messageText = message.text() as ActionMoveEnum;
+      console.log(`Mensagem recebida: ${messageText}`);
 
-      const response = {
-        uuid: uuidv4(),
-        message: '',
-      };
+      const player = DB[roomId].players[userId];
+      const board = DB[roomId].board;
 
-      if (validMoves.includes(messageText)) {
-        response.message = messageText;
-      } else {
-        response.message = ActionMoveEnum.MOVEMENT_NOT_FOUND;
+      if (!player) {
+        console.error('Jogador não encontrado');
+        peerWithRoom.close();
+        return;
+      } else if (!board) {
+        console.error('Tabuleiro não encontrado');
+        peerWithRoom.close();
+        return;
       }
 
-      peerWithRoom.publish(peerWithRoom.room, JSON.stringify(response));
+      if (!player.movementTimeout) {
+        player.movementTimeout = new Date().getTime()
+      } else if (new Date().getTime() - player.movementTimeout < 500) {
+        const responseInvalidAction: IWebsocketResponse = {
+          type: TypeResponseEnum.INVALID_ACTION,
+          userId: userId,
+          message: 'Aguarde um pouco antes de se mover novamente'
+        };
+
+        // Envia a mensagem de volta para o peer que enviou
+        peerWithRoom.send(JSON.stringify(responseInvalidAction));
+
+        return
+      } else {
+        player.movementTimeout = new Date().getTime()
+      }
+
+      var pointsGetted = 0
+
+      if ([ActionMoveEnum.LEFT, ActionMoveEnum.RIGHT, ActionMoveEnum.TOP, ActionMoveEnum.DOWN].includes(messageText)) {
+        const adjacentBlock = getAdjacentBlock(board, player.position.x, player.position.y, messageText)
+
+        if (!adjacentBlock.block.isBlocked) {
+          if (adjacentBlock.block.points) {
+            player.points += adjacentBlock.block.points
+            pointsGetted = adjacentBlock.block.points
+            adjacentBlock.block.points = 0
+          }
+
+          player.direction = messageText
+          player.position.x = adjacentBlock.x
+          player.position.y = adjacentBlock.y
+        }
+
+        player.iteractions += 1
+      }
+
+      const interactionGetPoints: IInteractionGetPoints = {
+        points: pointsGetted,
+        type: TypeInteractionEnum.GET_POINTS
+      }
+
+      const response: IWebsocketResponse = {
+        type: TypeResponseEnum.MOVE_PLAYER,
+        userId: userId,
+        direction: messageText,
+        interaction: pointsGetted ? interactionGetPoints : undefined,
+        data: player,
+      };
+
+      // Envia a mensagem para todos os peers na sala
+      peerWithRoom.publish(roomId, JSON.stringify(response));
+
+      // Envia a mensagem de volta para o peer que enviou
+      peerWithRoom.send(JSON.stringify(response));
+
     } catch (error) {
       console.error('Erro ao processar mensagem:', error);
     }

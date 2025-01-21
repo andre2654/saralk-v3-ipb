@@ -1,10 +1,25 @@
 <template>
   <div
     :class="[
-      'h-sk-height-block w-sk-width-block relative flex cursor-pointer items-center justify-center overflow-hidden border-2 hover:opacity-40',
+      'relative flex h-sk-height-block w-sk-width-block cursor-pointer items-center justify-center overflow-hidden border-2 hover:opacity-40',
       blockClass,
     ]"
   >
+    <div v-if="points" class="relative">
+      <span
+        class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-xl text-white"
+        >{{ points }}</span
+      >
+      <img
+        class="image-pixelated pointer-events-none select-none"
+        src="/assets/images/bonus-ring-object.png"
+        alt="Bonus object"
+      />
+    </div>
+    <div v-if="debug" class="z-10 flex flex-col gap-1 text-white">
+      <span>X:{{ position.x }}</span>
+      <span>Y:{{ position.y }}</span>
+    </div>
     <img
       v-if="blocked"
       class="block-object image-pixelated pointer-events-none absolute select-none"
@@ -19,11 +34,23 @@
 import { GameBlockTypeEnum } from '@/enums/game'
 
 const props = defineProps({
-  groundType: {
+  type: {
     type: String,
     default: GameBlockTypeEnum.GRASSY_1,
   },
   blocked: {
+    type: Boolean,
+    default: false,
+  },
+  position: {
+    type: Object,
+    default: () => ({ x: 0, y: 0 }),
+  },
+  points: {
+    type: Number,
+    default: 0,
+  },
+  debug: {
     type: Boolean,
     default: false,
   },
@@ -79,12 +106,12 @@ const typeMapping: {
 }
 
 const blockClass = computed(() => {
-  const { bgClass, borderClass } = typeMapping[props.groundType] || {}
+  const { bgClass, borderClass } = typeMapping[props.type] || {}
   return `${bgClass} ${borderClass}`
 })
 
 const blockObjectClass = computed(() => {
-  return typeMapping[props.groundType]?.objectClass || ''
+  return typeMapping[props.type]?.objectClass || ''
 })
 </script>
 

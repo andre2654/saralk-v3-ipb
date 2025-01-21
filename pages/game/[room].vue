@@ -5,51 +5,84 @@
     >
       <OrganismsGameHeader />
       <MoleculesGameBoard />
-      <MoleculesGameJoystick class="absolute bottom-5 right-5" />
+      <MoleculesGameJoystick
+        class="absolute bottom-5 right-5"
+        @moveUp="sendWebSocket('top')"
+        @moveLeft="sendWebSocket('left')"
+        @moveRight="sendWebSocket('right')"
+        @moveDown="sendWebSocket('down')"
+      />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ActionMoveEnum } from '@/enums/actions'
-import { useWebSocket } from '@vueuse/core'
-const { startStopwatch, stopStopwatch } = useUtilitiesStore()
-const { moveUp, moveLeft, moveRight, moveDown } = useCharacterStore()
+import type { IWebsocketResponse } from '@/types/websocket'
+import { TypeResponseEnum } from '@/enums/websocket'
 
+const websocket = useWebsocketStore()
+const { initializeWebSocket, closeWebSocket, sendWebSocket } =
+  useWebsocketStore()
+const { startStopwatch, stopStopwatch } = useUtilitiesStore()
+const { move, createGame, addPlayer, addMe, removePlayer } = useCharacterStore()
 const route = useRoute()
 
-const { status, data, send, close } = useWebSocket(
-  `ws://localhost:3000/api/websocket?room=${route.params.room}`
-)
-const history = ref<string[]>([])
+const roomId: string = route.params.room as string
 
-watch(data, (newData) => {
-  const newWSMessage = JSON.parse(newData)
-  const uuid: string = newWSMessage.uuid
-  const message: ActionMoveEnum = newWSMessage.message
+watch(
+  () => websocket?.websocket?.data,
+  (value) => {
+    if (!value) return
 
-  switch (message) {
-    case ActionMoveEnum.TOP:
-      moveUp()
-      break
-    case ActionMoveEnum.LEFT:
-      moveLeft()
-      break
-    case ActionMoveEnum.RIGHT:
-      moveRight()
-      break
-    case ActionMoveEnum.DOWN:
-      moveDown()
-      break
+    const response: IWebsocketResponse = JSON.parse(value)
+    const type = response.type
+
+    switch (type) {
+      case TypeResponseEnum.NEW_PLAYER:
+        console.log('NEW_PLAYER')
+        addPlayer(response.userId, response.data)
+        break
+      case TypeResponseEnum.YOUR_PLAYER:
+        console.log('YOUR_PLAYER')
+        addMe(response.userId, response.data)
+        break
+      case TypeResponseEnum.GAME_INFO:
+        console.log('GAME_INFO')
+        createGame(response.data)
+        break
+      case TypeResponseEnum.MOVE_PLAYER:
+        console.log(
+          'MOVE_PLAYER',
+          response.userId,
+          response.direction,
+          response.data,
+          response.interaction
+        )
+        move(
+          response.userId,
+          response.direction,
+          response.data,
+          response.interaction
+        )
+        break
+      case TypeResponseEnum.REMOVE_PLAYER:
+        console.log('REMOVE_PLAYER')
+        removePlayer(response.userId)
+        break
+      case TypeResponseEnum.INVALID_ACTION:
+        console.log(response.message)
+        break
+    }
   }
-})
+)
 
 onMounted(() => {
+  initializeWebSocket(roomId)
   startStopwatch()
 })
 
 onUnmounted(() => {
   stopStopwatch()
-  close()
+  closeWebSocket()
 })
 </script>
