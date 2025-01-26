@@ -5,7 +5,7 @@ import { useWebSocket } from '@vueuse/core';
 
 // Conexão WebSocket
 const host = window.location.host
-const connection_url = `ws://${host}/api/websocket?userType=${TypeUserEnum.PLAYER}`;
+const connection_url = `wss://${host}/api/websocket?userType=${TypeUserEnum.PLAYER}`;
 
 // Algoritmo BFS com WebSocket
 export async function breadthFirstSearchWorker(roomId: string) {
