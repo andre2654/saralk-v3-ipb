@@ -4,9 +4,11 @@ export enum TypeResponseEnum {
   GAME_INFO = 'gameInfo',
   MOVE_PLAYER = 'movePlayer',
   REMOVE_PLAYER = 'removePlayer',
-  INVALID_ACTION = 'invalidAction'
+  INVALID_ACTION = 'invalidAction',
+  BOARD_INFO = 'boardInfo',
 }
 
 export enum TypeInteractionEnum {
-  GET_POINTS = 'getPoints'
+  GET_POINTS = 'getPoints',
+  REACHED_GOAL = 'reachedGoal',
 }

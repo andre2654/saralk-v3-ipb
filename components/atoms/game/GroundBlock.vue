@@ -1,10 +1,20 @@
 <template>
   <div
     :class="[
-      'relative flex h-sk-height-block w-sk-width-block cursor-pointer items-center justify-center overflow-hidden border-2 hover:opacity-40',
+      'relative flex h-sk-height-block w-sk-width-block cursor-pointer items-center justify-center overflow-hidden hover:opacity-40',
+      !userIsInformed && !blockIsAdjacent ? 'border-none' : 'border-2',
       blockClass,
     ]"
   >
+    <TransitionFade>
+      <div
+        v-if="!userIsInformed && !blockIsAdjacent"
+        :class="{
+          'opacity-80': blockIsAround,
+        }"
+        class="absolute left-0 top-0 z-20 h-full w-full bg-black"
+      />
+    </TransitionFade>
     <div v-if="points" class="relative">
       <span
         class="absolute left-1/2 top-1/2 z-10 ms-[2.5px] mt-[2px] -translate-x-1/2 -translate-y-1/2 font-sk-font-pixel text-sm text-[#FFEAB4]"
@@ -22,7 +32,7 @@
       <span>Y:{{ position.y }}</span>
     </div>
     <img
-      v-if="blocked"
+      v-if="blocked && blockObjectClass"
       class="block-object image-pixelated pointer-events-none absolute select-none"
       src="/assets/images/block-objects.png"
       alt="Block object"
@@ -32,7 +42,11 @@
 </template>
 
 <script setup lang="ts">
+import { TransitionFade } from '@morev/vue-transitions'
 import { GameBlockTypeEnum } from '@/enums/game'
+import { isAdjacent, isAround } from '@/utils/helpers'
+
+const characterStore = useCharacterStore()
 
 const props = defineProps({
   type: {
@@ -61,7 +75,7 @@ const typeMapping: {
   [key: string]: {
     bgClass: string
     borderClass: string
-    objectClass: string
+    objectClass?: string
   }
 } = {
   [GameBlockTypeEnum.GRASSY_1]: {
@@ -104,7 +118,40 @@ const typeMapping: {
     borderClass: 'border-sk-color-block-swampy-border',
     objectClass: 'block-swampy',
   },
+  [GameBlockTypeEnum.GOAL]: {
+    bgClass: 'bg-[url("/assets/images/block-goal.png")] bg-center bg-cover',
+    borderClass: 'border-black',
+  },
 }
+
+const userIsInformed = computed(() => {
+  return characterStore.currentPlayer?.informed
+})
+
+const blockIsAdjacent = computed(() => {
+  return (
+    characterStore.currentPlayer &&
+    isAdjacent(
+      props.position.x,
+      props.position.y,
+      characterStore.currentPlayer.position.x,
+      characterStore.currentPlayer.position.y
+    )
+  )
+})
+
+const blockIsAround = computed(() => {
+  return (
+    characterStore.currentPlayer &&
+    isAround(
+      props.position.x,
+      props.position.y,
+      characterStore.currentPlayer.position.x,
+      characterStore.currentPlayer.position.y,
+      2
+    )
+  )
+})
 
 const blockClass = computed(() => {
   const { bgClass, borderClass } = typeMapping[props.type] || {}
@@ -112,7 +159,7 @@ const blockClass = computed(() => {
 })
 
 const blockObjectClass = computed(() => {
-  return typeMapping[props.type]?.objectClass || ''
+  return typeMapping[props.type]?.objectClass || null
 })
 </script>
 

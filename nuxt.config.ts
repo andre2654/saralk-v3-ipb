@@ -24,6 +24,10 @@ export default defineNuxtConfig({
     plugins: [svgLoader()],
   },
 
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
+
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',

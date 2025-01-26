@@ -1,8 +1,10 @@
 import { useWebSocket } from '@vueuse/core'
+import type { ActionMoveEnum, TypeUserEnum } from '@/enums/game'
+import { ActionMoveEnum as ActionMoveEnumValue } from '@/enums/game'
 
 interface Websocket {
   data: Ref
-  send: (data: any) => void
+  send: (data: ActionMoveEnum) => void
   close: () => void
 }
 
@@ -10,22 +12,22 @@ export const useWebsocketStore = defineStore('websocket', {
   state: () => {
     return {
       websocket: null as Websocket | null,
-      heartBeat: null as any,
+      heartBeat: null as NodeJS.Timer | null,
     }
   },
   actions: {
-    initializeWebSocket(roomId: string) {
-      const connection_url = `ws://localhost:3000/api/websocket?room=${roomId}`
+    initializeWebSocket(roomId: string, userType: TypeUserEnum, userName: string | null) {
+      const connection_url = `ws://localhost:3000/api/websocket?room=${roomId}&userType=${userType}&userName=${userName}`
 
       const { data, send, close } = useWebSocket(connection_url)
 
-      // this.heartBeat = setInterval(() => {
-      //   send(JSON.stringify({ online: roomId }))
-      // }, 120000)
+      this.heartBeat = setInterval(() => {
+        send(ActionMoveEnumValue.HEARTBEAT)
+      }, 120000)
 
       this.websocket = { data, send, close }
     },
-    sendWebSocket(data: string) {
+    sendWebSocket(data: ActionMoveEnum) {
       if (!this.websocket) return
       this.websocket.send(data)
     },

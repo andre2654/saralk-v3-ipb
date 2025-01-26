@@ -1,31 +1,45 @@
-import { GameBlockTypeEnum } from '@/enums/game';
-import { ActionMoveEnum } from '@/enums/actions';
-import type { IBlock, IBoard, IPlayer } from '@/types/game';
+import { GameBlockTypeEnum, ActionMoveEnum, TypeUserEnum as TypeUserEnumValue } from '@/enums/game';
+import type { IAdjacentBlocks } from '@/types/websocket';
+import type { TypeUserEnum } from '@/enums/game';
+import type { IBlock, IBoard, IPlayer, IPosition } from '@/types/game';
 
-export function generatePlayer(lastPlayerId: number): IPlayer {
+
+export function generatePlayer(lastPlayerId: number, userName: string | null, type: TypeUserEnum): IPlayer {
   return {
-    id: lastPlayerId++,
+    name: userName || lastPlayerId.toString(),
+    type: type,
     position: {
       x: 0,
       y: 0
     },
+    informed: type !== TypeUserEnumValue.SPECTATOR ? false : true,
     points: 0,
     iteractions: 0,
     direction: ActionMoveEnum.RIGHT,
     inMovement: false,
-    movementTimeout: null
+    movementTimeout: null,
+    reachedGoal: false
   }
 }
 
 const randomBlockType = (): GameBlockTypeEnum => {
-  const keys = Object.keys(GameBlockTypeEnum);
-  const randomBlockType: number = Math.floor(Math.random() * keys.length);
-  return GameBlockTypeEnum[keys[randomBlockType]];
+  const blockTypes = [
+    GameBlockTypeEnum.GRASSY_1,
+    GameBlockTypeEnum.GRASSY_2,
+    GameBlockTypeEnum.ROCKY_1,
+    GameBlockTypeEnum.ROCKY_2,
+    GameBlockTypeEnum.SANDY_1,
+    GameBlockTypeEnum.SANDY_2,
+    GameBlockTypeEnum.SWAMPY_1,
+    GameBlockTypeEnum.SWAMPY_2
+  ]
+
+  return blockTypes[Math.floor(Math.random() * blockTypes.length)];
 }
 
-function generateBlock(): IBlock {
-  // possibility of generating a blocked block is 5%
-  const isBlocked = Math.random() < 0.05;
+function generateBlock(x: number, y: number): IBlock {
+  // possibility of generating a blocked block is 3%
+  const isBlocked = Math.random() < 0.03;
 
   // points are generated randomly between 10, 20, 30 and 50
   // the probability of generating any of these values is 5%
@@ -34,56 +48,60 @@ function generateBlock(): IBlock {
   return {
     type: randomBlockType(),
     isBlocked: isBlocked,
-    points: !isBlocked ? points : 0
+    points: !isBlocked ? points : 0,
+    position: { x, y }
   }
 }
 
 export function generateBoard(size: number): IBoard {
   const board: IBoard = [];
 
-  for (let i = 0; i < size; i++) {
+  for (let y = 0; y < size; y++) {
     const row: IBlock[] = [];
 
-    for (let j = 0; j < size; j++) {
-      row.push(generateBlock());
+    for (let x = 0; x < size; x++) {
+      row.push(generateBlock(x, y));
     }
 
     board.push(row);
   }
 
+  // the initial block is never blocked
+  board[0][0].isBlocked = false;
+
+  // Randomly select a block to be the goal (must be the lasts rows)
+  const goalX = Math.floor(Math.random() * size);
+  const goalY = Math.floor(Math.random() * (size - (size / 2)) + size / 2);
+
+  board[goalY][goalX].type = GameBlockTypeEnum.GOAL;
+  board[goalY][goalX].isBlocked = false;
+
   return board;
 }
 
-export function getAdjacentBlock(board: IBoard, x: number, y: number, direction: ActionMoveEnum): { block: IBlock, x: number, y: number } {
-  const offsets = {
-    [ActionMoveEnum.LEFT]: { dx: -1, dy: 0 },
-    [ActionMoveEnum.RIGHT]: { dx: 1, dy: 0 },
-    [ActionMoveEnum.TOP]: { dx: 0, dy: -1 },
-    [ActionMoveEnum.DOWN]: { dx: 0, dy: 1 },
+export function getAdjacentBlocks(board: IBoard, player: IPlayer): IAdjacentBlocks {
+  const offsets = {} as {
+    [key in ActionMoveEnum]: IPosition;
   };
 
-  const { dx, dy } = offsets[direction];
-  const maxX = board[0].length - 1;
-  const maxY = board.length - 1;
+  offsets[ActionMoveEnum.LEFT] = { x: -1, y: 0 };
+  offsets[ActionMoveEnum.RIGHT] = { x: 1, y: 0 };
+  offsets[ActionMoveEnum.TOP] = { x: 0, y: -1 };
+  offsets[ActionMoveEnum.DOWN] = { x: 0, y: 1 };
 
-  let newX = x + dx;
-  let newY = y + dy;
+  const adjacentBlocks: IAdjacentBlocks = {};
 
-  if (newX < 0) {
-    newX = 0;
-  } else if (newX > maxX) {
-    newX = maxX;
+  for (const direction in offsets) {
+    const offset: IPosition = offsets[direction as keyof typeof offsets];
+    const x = player.position.x + offset.x;
+    const y = player.position.y + offset.y;
+
+    if (x < 0 || x >= board.length || y < 0 || y >= board.length) {
+      continue;
+    }
+
+    adjacentBlocks[direction as ActionMoveEnum] = board[y][x];
   }
 
-  if (newY < 0) {
-    newY = 0;
-  } else if (newY > maxY) {
-    newY = maxY;
-  }
-
-  return {
-    block: board[newY][newX],
-    x: newX,
-    y: newY
-  };
+  return adjacentBlocks;
 }

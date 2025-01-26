@@ -1,6 +1,7 @@
-import type { IPlayer, IGame } from '@/types/game';
-import type { IInteractionGetPoints } from '@/types/websocket';
-import { ActionMoveEnum } from '@/enums/actions'
+import type { IPlayer, IGame, IBoard } from '@/types/game';
+import type { IInteractions } from '@/types/websocket';
+import type { ActionMoveEnum } from '@/enums/game'
+import { TypeInteractionEnum } from '@/enums/websocket';
 
 interface IState {
   me: string
@@ -22,7 +23,7 @@ export const useCharacterStore = defineStore('character', {
       this.me = userId
       this.game.players[userId] = player
     },
-    move(userId: string, direction: ActionMoveEnum, data: IPlayer, interaction?: IInteractionGetPoints) {
+    move(userId: string, direction: ActionMoveEnum, data: IPlayer, interactions: IInteractions) {
       const player = this.game.players[userId]
 
       player.direction = direction
@@ -47,24 +48,48 @@ export const useCharacterStore = defineStore('character', {
 
       player.iteractions = data.iteractions
 
-      if (interaction) {
+      if (interactions[TypeInteractionEnum.GET_POINTS]) {
         player.points = data.points
-        this.getPointFromBlock(data.position.x, data.position.y)
+        this.game.board[data.position.y][data.position.x].points = 0
+      }
+      if (interactions[TypeInteractionEnum.REACHED_GOAL]) {
+        player.reachedGoal = true
       }
     },
     removePlayer(userId: string) {
       delete this.game.players[userId]
     },
-    getPointFromBlock(x: number, y: number) {
-      const block = this.game.board[y][x]
-      block.points = 0
+    addBoardInfo(board: IBoard, userId: string) {
+      this.game.board = board
+      this.game.players[userId].informed = true
     },
-    getAllPlayers() {
-      if (!this.game?.players) {
+  },
+  getters: {
+    currentPlayer(state): IPlayer | null {
+      if (!state.game?.players || !state.me) {
+        return null
+      }
+      return state.game.players[state.me]
+    },
+    currentPlayerId(state): string {
+      return state.me
+    },
+    allPlayers(state): IPlayer[] {
+      if (!state.game?.players) {
         return []
       }
 
-      return Object.keys(this.game.players)
+      return Object.values(state.game.players)
+    },
+    allPlayersIds(state): string[] {
+      if (!state.game?.players) {
+        return []
+      }
+
+      return Object.keys(state.game.players)
+    },
+    currentGame(state): IGame {
+      return state.game
     }
   },
 })

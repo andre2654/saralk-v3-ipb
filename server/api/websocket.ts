@@ -1,9 +1,10 @@
-import { ActionMoveEnum } from '@/enums/actions';
+import { GameBlockTypeEnum, ActionMoveEnum, TypeUserEnum as TypeUserEnumValue } from '@/enums/game';
+import type { TypeUserEnum } from '@/enums/game';
 import { TypeResponseEnum, TypeInteractionEnum } from '@/enums/websocket';
-import type { IWebsocketResponse, IInteractionGetPoints } from '@/types/websocket';
+import type { IWebsocketResponse, IInteractions, IInteractionReachedGoal, IInteractionGetPoints, IAdjacentBlocks } from '@/types/websocket';
 import type { IAllGames, IGame } from '@/types/game';
 import type { Peer } from 'crossws';
-import { generatePlayer, generateBoard, getAdjacentBlock } from '@/server/utils/helpers'
+import { generatePlayer, generateBoard, getAdjacentBlocks } from '@/server/utils/helpers'
 
 const BOARD_SIZE = 20;
 
@@ -26,8 +27,10 @@ export default defineWebSocketHandler({
         return;
       }
 
-      const parsedUrl = new URL(url);
-      const roomId = parsedUrl.searchParams.get('room');
+      const parsedUrl: URL = new URL(url);
+      const roomId: string | null = parsedUrl.searchParams.get('room');
+      const userName: string | null = parsedUrl.searchParams.get('userName');
+      const userType: TypeUserEnum = parsedUrl.searchParams.get('userType') as TypeUserEnum || TypeUserEnumValue.PLAYER;
 
       if (!roomId) {
         console.error('ID da sala não especificado na URL');
@@ -43,16 +46,18 @@ export default defineWebSocketHandler({
       if (!DB[roomId]) {
         const game: IGame = {
           players: {},
-          lastPlayerId: 0,
+          quantityPlayersEntered: 0,
           board: generateBoard(BOARD_SIZE)
         }
-        game.players[userId] = generatePlayer(game.lastPlayerId)
+        game.players[userId] = generatePlayer(game.quantityPlayersEntered, userName, userType)
         DB[roomId] = game;
-        DB[roomId].lastPlayerId += 1
+        DB[roomId].quantityPlayersEntered += 1
       } else {
-        DB[roomId].players[userId] = generatePlayer(DB[roomId].lastPlayerId)
-        DB[roomId].lastPlayerId += 1
+        DB[roomId].players[userId] = generatePlayer(DB[roomId].quantityPlayersEntered, userName, userType)
+        DB[roomId].quantityPlayersEntered += 1
       }
+
+      const adjacentBlocks: IAdjacentBlocks = getAdjacentBlocks(DB[roomId].board, DB[roomId].players[userId])
 
       console.log(`Peer conectado à sala: ${roomId}`);
 
@@ -60,6 +65,7 @@ export default defineWebSocketHandler({
         type: TypeResponseEnum.YOUR_PLAYER,
         userId: userId,
         data: DB[roomId].players[userId],
+        adjacentBlocks: adjacentBlocks
       };
 
       const responseNewPlayer: IWebsocketResponse = {
@@ -145,9 +151,13 @@ export default defineWebSocketHandler({
         return;
       }
 
+      if (messageText === ActionMoveEnum.HEARTBEAT) {
+        return
+      }
+
       if (!player.movementTimeout) {
         player.movementTimeout = new Date().getTime()
-      } else if (new Date().getTime() - player.movementTimeout < 500) {
+      } else if (new Date().getTime() - player.movementTimeout < 350) {
         const responseInvalidAction: IWebsocketResponse = {
           type: TypeResponseEnum.INVALID_ACTION,
           userId: userId,
@@ -158,41 +168,86 @@ export default defineWebSocketHandler({
         peerWithRoom.send(JSON.stringify(responseInvalidAction));
 
         return
+      } else if (player.reachedGoal) {
+        const responseInvalidAction: IWebsocketResponse = {
+          type: TypeResponseEnum.INVALID_ACTION,
+          userId: userId,
+          message: 'Você já alcançou o objetivo'
+        };
+
+        // Envia a mensagem de volta para o peer que enviou
+        peerWithRoom.send(JSON.stringify(responseInvalidAction));
+
+        return
       } else {
         player.movementTimeout = new Date().getTime()
       }
 
-      let pointsGetted = 0
+      const interactions = {} as IInteractions
+      const adjacentBlocks: IAdjacentBlocks = getAdjacentBlocks(board, player)
+      var adjacentBlocksAfterMove: IAdjacentBlocks = {} as IAdjacentBlocks
 
-      if ([ActionMoveEnum.LEFT, ActionMoveEnum.RIGHT, ActionMoveEnum.TOP, ActionMoveEnum.DOWN].includes(messageText)) {
-        const adjacentBlock = getAdjacentBlock(board, player.position.x, player.position.y, messageText)
+      if (messageText === ActionMoveEnum.GET_BOARD_INFO) {
+        const responseBoardInfo: IWebsocketResponse = {
+          type: TypeResponseEnum.BOARD_INFO,
+          board: board,
+          userId: userId,
+        };
 
-        if (!adjacentBlock.block.isBlocked) {
-          if (adjacentBlock.block.points) {
-            player.points += adjacentBlock.block.points
-            pointsGetted = adjacentBlock.block.points
-            adjacentBlock.block.points = 0
+        player.informed = true
+
+        // Envia a mensagem de volta para o peer que enviou
+        peerWithRoom.send(JSON.stringify(responseBoardInfo));
+
+        return
+      } else if ([ActionMoveEnum.LEFT, ActionMoveEnum.RIGHT, ActionMoveEnum.TOP, ActionMoveEnum.DOWN].includes(messageText)) {
+        const adjacentBlocks = getAdjacentBlocks(board, player)
+        const nextBlock = adjacentBlocks[messageText]
+
+        if (nextBlock && (!nextBlock.isBlocked || player.type === TypeUserEnumValue.SPECTATOR)) {
+          const blockType = nextBlock.type
+          const blockPoints = nextBlock.points
+
+          if (player.type !== TypeUserEnumValue.SPECTATOR) {
+            if (blockType === GameBlockTypeEnum.GOAL) {
+              player.reachedGoal = true
+              interactions[TypeInteractionEnum.REACHED_GOAL] = <IInteractionReachedGoal>{
+                position: {
+                  x: nextBlock.position.x,
+                  y: nextBlock.position.y
+                }
+              }
+            }
+            if (blockPoints) {
+              player.points += blockPoints
+              nextBlock.points = 0
+
+              interactions[TypeInteractionEnum.GET_POINTS] = <IInteractionGetPoints>{
+                position: {
+                  x: nextBlock.position.x,
+                  y: nextBlock.position.y
+                },
+                points: blockPoints
+              }
+            }
           }
 
           player.direction = messageText
-          player.position.x = adjacentBlock.x
-          player.position.y = adjacentBlock.y
+          player.position.x = nextBlock.position.x
+          player.position.y = nextBlock.position.y
         }
 
+        adjacentBlocksAfterMove = getAdjacentBlocks(board, player)
         player.iteractions += 1
-      }
-
-      const interactionGetPoints: IInteractionGetPoints = {
-        points: pointsGetted,
-        type: TypeInteractionEnum.GET_POINTS
       }
 
       const response: IWebsocketResponse = {
         type: TypeResponseEnum.MOVE_PLAYER,
         userId: userId,
         direction: messageText,
-        interaction: pointsGetted ? interactionGetPoints : undefined,
+        interactions: interactions,
         data: player,
+        adjacentBlocks: adjacentBlocksAfterMove
       };
 
       // Envia a mensagem para todos os peers na sala

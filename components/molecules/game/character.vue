@@ -4,32 +4,47 @@
     class="absolute z-[1]"
     :class="{
       'cursor-not-allowed opacity-50': !itsMe,
+      hidden:
+        characterStore.currentPlayer &&
+        !itsMe &&
+        !characterStore.currentPlayer.informed &&
+        !isAdjacent(
+          character.position.x,
+          character.position.y,
+          characterStore.currentPlayer.position.x,
+          characterStore.currentPlayer.position.y
+        ),
     }"
     :style="containerStyle"
   >
     <div
-      class="group absolute -left-[15px] -top-[45px] flex min-w-max items-center gap-2"
+      class="absolute -top-[45px] left-0 flex min-w-max items-center gap-2"
+      @mouseenter="showPointsBar = true"
+      @mouseleave="showPointsBar = false"
     >
-      <AtomsPixelatedBox
-        class="border-sk-color-gold px-3 pb-[5px] pt-[8px] text-xs text-sk-color-gold"
+      <div
+        class="flex items-center gap-1 rounded-full bg-black/70 px-3 py-2 text-white"
         :class="[itsMe ? 'cursor-help' : 'cursor-not-allowed']"
       >
-        Usuário {{ character.id }}
-      </AtomsPixelatedBox>
-      <AtomsPixelatedBox
-        class="items-center gap-3 border-sk-color-gold px-5 pb-[5px] pt-[8px] text-xs"
-        :class="{
-          flex: showPointsBar,
-          hidden: !showPointsBar,
-          'group-hover:flex': itsMe,
-        }"
-      >
-        <span class="text-[#EEE5E0]"> {{ character.points }} pontos </span>
-        <div class="mb-1 h-[15px] w-[2px] bg-sk-color-gold" />
-        <span class="text-[#EEE5E0]">
-          {{ character.iteractions }} iterações
-        </span>
-      </AtomsPixelatedBox>
+        <div
+          class="h-3 w-3 rounded-full"
+          :class="[character.reachedGoal ? 'bg-sk-color-gold' : 'bg-white']"
+        />
+        <IconEye v-if="character.informed" class="h-4 w-4 fill-white" />
+        {{ character.name }}
+      </div>
+      <TransitionSlide :offset="offsetSlide">
+        <div
+          v-show="showPointsBar"
+          class="flex items-center gap-2 rounded-full bg-black/70 px-3 py-2 text-white"
+        >
+          <span class="text-[#EEE5E0]"> {{ character.points }} pontos </span>
+          <span>-</span>
+          <span class="text-[#EEE5E0]">
+            {{ character.iteractions }} iterações
+          </span>
+        </div>
+      </TransitionSlide>
     </div>
     <div
       id="character"
@@ -46,8 +61,11 @@
 </template>
 
 <script setup lang="ts">
-import { ActionMoveEnum } from '@/enums/actions'
+import { isAdjacent } from '@/utils/helpers'
+import { ActionMoveEnum, TypeUserEnum } from '@/enums/game'
 import type { IPlayer } from '@/types/game'
+import IconEye from '@/public/assets/icons/icon-eye.svg'
+import { TransitionSlide } from '@morev/vue-transitions'
 
 const characterStore = useCharacterStore()
 
@@ -59,25 +77,33 @@ const props = defineProps({
   },
 })
 
+const offsetSlide = {
+  enter: [-16, 0],
+  leave: [-16, 0],
+}
+
 const character = computed<IPlayer>(() => {
-  if (!characterStore.game.players[props.userId]) {
-    return {
-      id: 0,
-      position: {
-        x: 0,
-        y: 0,
-      },
-      points: 0,
-      iteractions: 0,
-      direction: ActionMoveEnum.RIGHT,
-      inMovement: false,
-      movementTimeout: null,
-    }
+  if (characterStore.currentGame.players[props.userId]) {
+    return characterStore.currentGame.players[props.userId]
   }
-  return characterStore.game.players[props.userId]
+  return {
+    name: '0',
+    type: TypeUserEnum.PLAYER,
+    position: {
+      x: 0,
+      y: 0,
+    },
+    informed: false,
+    points: 0,
+    iteractions: 0,
+    direction: ActionMoveEnum.RIGHT,
+    inMovement: false,
+    movementTimeout: null,
+    reachedGoal: false,
+  }
 })
 
-const itsMe = computed(() => characterStore.me === props.userId)
+const itsMe = computed(() => characterStore.currentPlayerId === props.userId)
 
 const skHeightBlock = 90
 
@@ -115,9 +141,13 @@ const topValues: {
 const characterStyle = computed(() => {
   const topMultiplier = topValues[character.value.direction]
   const topValue = `calc(${topMultiplier} * ${skHeightBlock}px)`
+  const spectatorTopValue = '-485px'
 
   const style: Record<string, string> = {
-    top: topValue,
+    top:
+      character.value.type === TypeUserEnum.SPECTATOR
+        ? spectatorTopValue
+        : topValue,
   }
   return style
 })

@@ -1,6 +1,6 @@
 <template>
   <main
-    class="bg-sk-color-bg flex h-full min-h-screen w-full flex-col items-center justify-around gap-3 overflow-hidden px-4"
+    class="flex h-full min-h-screen w-full flex-col items-center justify-around gap-3 overflow-hidden bg-sk-color-bg px-4"
   >
     <AtomsLogo />
     <div
@@ -9,12 +9,17 @@
           ? 'max-w-[400px]'
           : 'md:max-w-[700px] xl:max-w-[1200px]',
       ]"
-      class="flex w-full max-w-[800px] flex-col items-center justify-center gap-4"
+      class="flex w-full max-w-[800px] flex-col gap-4"
     >
-      <slot />
-      <AtomsLink v-if="route.path !== '/'" to="/" class="ml-auto">{{
-        $t('general.return')
-      }}</AtomsLink>
+      <div class="flex w-full flex-col items-center justify-center gap-4">
+        <slot />
+      </div>
+      <AtomsLink
+        v-if="route.path !== '/'"
+        @click="$router.go(-1)"
+        class="ml-auto cursor-pointer"
+        >{{ $t('general.return') }}</AtomsLink
+      >
     </div>
     <AtomsCreateByLine />
   </main>
