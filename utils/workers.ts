@@ -4,7 +4,8 @@ import { TypeResponseEnum, TypeInteractionEnum } from '@/enums/websocket';
 import { useWebSocket } from '@vueuse/core';
 
 // Conexão WebSocket
-const connection_url = `ws://localhost:3000/api/websocket?userType=${TypeUserEnum.PLAYER}`;
+const host = window.location.host
+const connection_url = `ws://${host}/api/websocket?userType=${TypeUserEnum.PLAYER}`;
 
 // Algoritmo BFS com WebSocket
 export async function breadthFirstSearchWorker(roomId: string) {
