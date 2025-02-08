@@ -45,7 +45,6 @@ const {
   addMe,
   removePlayer,
   addBoardInfo,
-  currentPlayer,
 } = useCharacterStore()
 const characterStore = useCharacterStore()
 const route = useRoute()

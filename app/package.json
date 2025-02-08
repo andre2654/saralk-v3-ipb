@@ -16,6 +16,7 @@
     "@pinia/nuxt": "0.5.5",
     "@vueuse/core": "11.1.0",
     "crossws": "0.3.1",
+    "mongoose": "8.10.0",
     "uuid": "10.0.0",
     "vite-svg-loader": "5.1.0",
     "vue": "3.5.11",

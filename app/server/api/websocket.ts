@@ -115,6 +115,12 @@ export default defineWebSocketHandler({
     peer.publish(roomId, JSON.stringify(responseRemovePlayer));
 
     console.log(`Conexão fechada (Peer ID: ${userId})`);
+
+    // Verifica se a sala está vazia
+    if (Object.keys(DB[roomId].players).length === 0) {
+      delete DB[roomId];
+      console.log(`Sala removida (ID: ${roomId})`);
+    }
   },
 
   error(peer, error) {
