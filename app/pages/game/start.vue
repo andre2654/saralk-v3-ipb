@@ -2,7 +2,7 @@
   <div class="flex w-full max-w-[400px] flex-col items-center gap-5">
     <input
       v-model="gameForm.name"
-      class="sk-border-pixelated w-full border-4 border-sk-color-border bg-sk-color-bg fill-sk-color-border p-3 text-center font-sk-font-pixel text-sk-color-border"
+      class="sk-border-pixelated border-sk-color-border bg-sk-color-bg fill-sk-color-border font-sk-font-pixel text-sk-color-border w-full border-4 p-3 text-center"
       type="text"
       placeholder="Digite seu nome"
     />
@@ -19,7 +19,7 @@
           :class="[
             gameForm.type && gameForm.type !== character.id
               ? 'text-sk-color-border opacity-50'
-              : 'px-[50px] text-sk-color-gold',
+              : 'text-sk-color-gold px-[50px]',
           ]"
           @click="selectCharacterType(character.id)"
         >
@@ -28,7 +28,7 @@
             :src="character.image"
             :alt="character.name"
           />
-          <span class="mx-auto font-sk-font-pixel">{{ character.name }}</span>
+          <span class="font-sk-font-pixel mx-auto">{{ character.name }}</span>
         </div>
       </div>
     </div>
@@ -36,11 +36,11 @@
     <div class="flex flex-col gap-2">
       <input
         v-model="gameForm.roomId"
-        class="sk-border-pixelated w-full border-4 border-sk-color-border bg-sk-color-bg fill-sk-color-border p-3 text-center font-sk-font-pixel text-sk-color-border"
+        class="sk-border-pixelated border-sk-color-border bg-sk-color-bg fill-sk-color-border font-sk-font-pixel text-sk-color-border w-full border-4 p-3 text-center"
         type="text"
         placeholder="Digite a sala"
       />
-      <span class="text-center font-sk-font-pixel text-xs text-white"
+      <span class="font-sk-font-pixel text-center text-xs text-white"
         >Ou deixe em branco para entrar em uma nova sala</span
       >
     </div>
@@ -84,6 +84,13 @@ const gameForm = reactive<{
 
 const gameUrl = computed(() => {
   const roomId = gameForm.roomId || uuidv4()
-  return `/game/${roomId}/${gameForm.type}/${gameForm.name}`
+
+  let query = `/game/${roomId}/${gameForm.type}`
+
+  if (gameForm.name) {
+    query += `?userName=${gameForm.name}`
+  }
+
+  return query
 })
 </script>

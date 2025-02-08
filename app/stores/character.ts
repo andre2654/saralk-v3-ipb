@@ -1,4 +1,4 @@
-import type { IPlayer, IGame, IBoard } from '@/types/game';
+import type { IPlayer, IPlayers, IGame, IBoard } from '@/types/game';
 import type { IInteractions } from '@/types/websocket';
 import type { ActionMoveEnum } from '@/enums/game'
 import { TypeInteractionEnum } from '@/enums/websocket';
@@ -74,12 +74,12 @@ export const useCharacterStore = defineStore('character', {
     currentPlayerId(state): string {
       return state.me
     },
-    allPlayers(state): IPlayer[] {
+    allPlayers(state): IPlayers {
       if (!state.game?.players) {
-        return []
+        return {}
       }
 
-      return Object.values(state.game.players)
+      return state.game.players
     },
     allPlayersIds(state): string[] {
       if (!state.game?.players) {

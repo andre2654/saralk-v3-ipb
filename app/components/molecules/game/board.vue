@@ -6,6 +6,7 @@
   >
     <MoleculesGameCharacter
       v-for="userId in characterStore.allPlayersIds"
+      v-show="characterStore.allPlayers[userId].inGame"
       :key="userId"
       :user-id="userId"
     />

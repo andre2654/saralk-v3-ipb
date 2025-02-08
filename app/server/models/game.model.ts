@@ -18,6 +18,7 @@ const BlockSchema = new Schema<IBlock>({
 
 const PlayerSchema = new Schema<IPlayer>(
   {
+    peerId: { type: String, required: true },
     name: { type: String, required: true },
     type: { type: String, enum: Object.values(TypeUserEnum), required: true },
     position: {
@@ -35,6 +36,7 @@ const PlayerSchema = new Schema<IPlayer>(
     inMovement: { type: Boolean, default: false },
     movementTimeout: { type: Number, default: null },
     reachedGoal: { type: Boolean, default: false },
+    inGame: { type: Boolean, default: true },
   },
   { _id: false }
 )

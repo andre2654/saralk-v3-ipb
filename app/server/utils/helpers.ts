@@ -4,8 +4,9 @@ import type { TypeUserEnum } from '@/enums/game';
 import type { IBlock, IBoard, IPlayer, IPosition } from '@/types/game';
 
 
-export function generatePlayer(lastPlayerId: number, userName: string | null, type: TypeUserEnum): IPlayer {
+export function generatePlayer(lastPlayerId: number, userName: string | null, type: TypeUserEnum, peerId: string): IPlayer {
   return {
+    peerId: peerId,
     name: userName || lastPlayerId.toString(),
     type: type,
     position: {
@@ -18,7 +19,8 @@ export function generatePlayer(lastPlayerId: number, userName: string | null, ty
     direction: ActionMoveEnum.RIGHT,
     inMovement: false,
     movementTimeout: null,
-    reachedGoal: false
+    reachedGoal: false,
+    inGame: true
   }
 }
 

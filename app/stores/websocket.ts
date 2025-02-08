@@ -16,9 +16,16 @@ export const useWebsocketStore = defineStore('websocket', {
     }
   },
   actions: {
-    initializeWebSocket(roomId: string, userType: TypeUserEnum, userName: string | null) {
+    initializeWebSocket(roomId: string, userType: TypeUserEnum, userName: string | null, userId: string | null) {
       const host = window.location.host
-      const connection_url = `ws://${host}/api/websocket?room=${roomId}&userType=${userType}&userName=${userName}`
+      let connection_url = `ws://${host}/api/websocket?room=${roomId}&userType=${userType}`
+
+      if (userName) {
+        connection_url += `&userName=${userName}`
+      }
+      if (userId) {
+        connection_url += `&userId=${userId}`
+      }
 
       const { data, send, close } = useWebSocket(connection_url)
 

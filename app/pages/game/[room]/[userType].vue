@@ -38,20 +38,16 @@ const websocket = useWebsocketStore()
 const { initializeWebSocket, closeWebSocket, sendWebSocket } =
   useWebsocketStore()
 const { startStopwatch, stopStopwatch } = useUtilitiesStore()
-const {
-  move,
-  createGame,
-  addPlayer,
-  addMe,
-  removePlayer,
-  addBoardInfo,
-} = useCharacterStore()
+const { move, createGame, addPlayer, addMe, removePlayer, addBoardInfo } =
+  useCharacterStore()
 const characterStore = useCharacterStore()
 const route = useRoute()
+const router = useRouter()
 
 const roomId: string = route.params.room as string
 const userType: TypeUserEnum = route.params.userType as TypeUserEnum
-const userName: string | null = route.params.userName as string
+const userName: string | null = route.query.userName as string
+const userId: string | null = route.query.userId as string
 
 watch(
   () => websocket?.websocket?.data,
@@ -68,6 +64,13 @@ watch(
         break
       case TypeResponseEnum.YOUR_PLAYER:
         console.log('YOUR_PLAYER', response)
+
+        if (!userId) {
+          router.push({
+            query: { userId: response.userId },
+          })
+        }
+
         addMe(response.userId, response.data)
         break
       case TypeResponseEnum.GAME_INFO:
@@ -99,7 +102,7 @@ watch(
 )
 
 onMounted(() => {
-  initializeWebSocket(roomId, userType, userName)
+  initializeWebSocket(roomId, userType, userName, userId)
   startStopwatch()
 })
 

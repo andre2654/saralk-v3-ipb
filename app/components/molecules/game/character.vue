@@ -48,7 +48,7 @@
     </div>
     <div
       id="character"
-      class="relative h-sk-height-block w-sk-width-block overflow-hidden"
+      class="h-sk-height-block w-sk-width-block relative overflow-hidden"
     >
       <img
         :class="characterClass"
@@ -100,6 +100,7 @@ const character = computed<IPlayer>(() => {
     inMovement: false,
     movementTimeout: null,
     reachedGoal: false,
+    inGame: true,
   }
 })
 
