@@ -7,6 +7,7 @@
         characterStore.currentPlayer?.informed ? 'bg-blue-300' : 'bg-black',
       ]"
     >
+      <MoleculesGameEndModal v-if="characterStore.currentPlayer?.reachedGoal" />
       <OrganismsGameHeader
         @get-board-info="sendWebSocket(ActionMoveEnum.GET_BOARD_INFO)"
         @breadth-first-search="breadthFirstSearchWorker(roomId)"
@@ -88,7 +89,7 @@ watch(
         break
       case TypeResponseEnum.REMOVE_PLAYER:
         console.log('REMOVE_PLAYER')
-        removePlayer(response.userId)
+        // removePlayer(response.userId)
         break
       case TypeResponseEnum.BOARD_INFO:
         console.log('BOARD_INFO')
