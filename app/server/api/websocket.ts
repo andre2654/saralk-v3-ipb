@@ -102,6 +102,7 @@ export default defineWebSocketHandler({
         type: TypeResponseEnum.YOUR_PLAYER,
         userId: userId,
         data: player,
+        currentBlock: game.board[player.position.y][player.position.x],
         adjacentBlocks: adjacentBlocks,
       }
 
@@ -327,6 +328,7 @@ export default defineWebSocketHandler({
         direction: messageText,
         interactions: interactions,
         data: player,
+        currentBlock: board[player.position.y][player.position.x],
         adjacentBlocks: adjacentBlocksAfterMove,
       }
 

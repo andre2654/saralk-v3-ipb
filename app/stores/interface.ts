@@ -1,13 +1,13 @@
-const STOPWATCH_DEFAULT = 60 * 10 // 10 minutes
-
 interface IState {
   sideMenuOpened: boolean
+  zoom: number
 }
 
 export const useInterfaceStore = defineStore('interface', {
   state: (): IState => {
     return {
-      sideMenuOpened: false
+      sideMenuOpened: false,
+      zoom: 1.0,
     }
   },
   actions: {
@@ -16,6 +16,14 @@ export const useInterfaceStore = defineStore('interface', {
     },
     hideSideMenu() {
       this.sideMenuOpened = false
+    },
+    increaseZoom() {
+      if (this.zoom > 1.3) return
+      this.zoom += 0.1
+    },
+    decreaseZoom() {
+      if (this.zoom < 0.5) return
+      this.zoom -= 0.1
     },
   },
 })

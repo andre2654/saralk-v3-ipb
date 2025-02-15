@@ -109,8 +109,8 @@ const itsMe = computed(() => characterStore.currentPlayerId === props.userId)
 const skHeightBlock = 90
 
 const containerStyle = computed(() => ({
-  left: `calc(208px + (${character.value.position.x} * ${skHeightBlock}px))`,
-  top: `calc(45px + (${character.value.position.y} * ${skHeightBlock}px))`,
+  left: `calc(10px + (${character.value.position.x} * ${skHeightBlock}px))`,
+  top: `calc(-5px + (${character.value.position.y} * ${skHeightBlock}px))`,
   transition: '0.3s ease-in-out',
 }))
 

@@ -32,6 +32,7 @@ export interface IWebsocketResponseYourPlayer {
   type: TypeResponseEnum.YOUR_PLAYER;
   userId: string;
   data: IPlayer;
+  currentBlock: IBlock;
   adjacentBlocks: IAdjacentBlocks;
 }
 
@@ -46,6 +47,7 @@ export interface IWebsocketResponseMovePlayer {
   direction: ActionMoveEnum;
   interactions: IInteractions;
   data: IPlayer;
+  currentBlock: IBlock;
   adjacentBlocks: IAdjacentBlocks;
 }
 

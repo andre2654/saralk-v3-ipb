@@ -1,27 +1,36 @@
 <template>
-  <div class="flex flex-col items-center justify-center gap-1">
-    <AtomsButton @click="emits('moveUp')" class="h-[55px] w-[55px]">
-      <IconArrowUp />
-    </AtomsButton>
-    <div class="flex items-center gap-1">
-      <AtomsButton @click="emits('moveLeft')" class="h-[55px] w-[55px]">
-        <IconArrowLeft />
+  <div class="flex flex-col items-center gap-4">
+    <div
+      class="flex w-[50px] flex-col gap-2 rounded-full bg-black/70 p-3 text-white"
+    >
+      <button @click="interfaceStore.increaseZoom">+</button>
+      <div>{{ interfaceStore.zoom.toFixed(2) }}</div>
+      <button @click="interfaceStore.decreaseZoom">-</button>
+    </div>
+    <div class="flex flex-col items-center justify-center gap-1">
+      <AtomsButton @click="emits('moveUp')" class="h-[55px] w-[55px]">
+        <IconArrowUp />
       </AtomsButton>
-      <AtomsButton class="h-[55px] w-[55px]" @click="scrollToCharacter">
-        <img
-          class="image-pixelated pointer-events-none select-none"
-          src="/assets/images/character-picture.png"
-          alt="Character picture"
-        />
-        {{ characterIsNotInViewport }}
-      </AtomsButton>
-      <AtomsButton @click="emits('moveRight')" class="h-[55px] w-[55px]">
-        <IconArrowRight />
+      <div class="flex items-center gap-1">
+        <AtomsButton @click="emits('moveLeft')" class="h-[55px] w-[55px]">
+          <IconArrowLeft />
+        </AtomsButton>
+        <AtomsButton class="h-[55px] w-[55px]" @click="scrollToCharacter">
+          <img
+            class="image-pixelated pointer-events-none select-none"
+            src="/assets/images/character-picture.png"
+            alt="Character picture"
+          />
+          {{ characterIsNotInViewport }}
+        </AtomsButton>
+        <AtomsButton @click="emits('moveRight')" class="h-[55px] w-[55px]">
+          <IconArrowRight />
+        </AtomsButton>
+      </div>
+      <AtomsButton @click="emits('moveDown')" class="h-[55px] w-[55px]">
+        <IconArrowDown />
       </AtomsButton>
     </div>
-    <AtomsButton @click="emits('moveDown')" class="h-[55px] w-[55px]">
-      <IconArrowDown />
-    </AtomsButton>
   </div>
 </template>
 
@@ -33,6 +42,7 @@ import IconArrowLeft from '@/public/assets/icons/icon-arrow-left.svg'
 import IconArrowRight from '@/public/assets/icons/icon-arrow-right.svg'
 
 const characterStore = useCharacterStore()
+const interfaceStore = useInterfaceStore()
 
 const emits = defineEmits(['moveUp', 'moveLeft', 'moveRight', 'moveDown'])
 
