@@ -14,8 +14,9 @@
         @depth-first-search="depthFirstSearchWorker(roomId)"
       />
       <MoleculesGameBoard />
+      <MoleculesGameControlZoom class="absolute right-3 top-[100px]" />
       <MoleculesGameJoystick
-        class="absolute bottom-2 right-2"
+        class="absolute bottom-3 right-3"
         @move-up="sendWebSocket(ActionMoveEnum.TOP)"
         @move-left="sendWebSocket(ActionMoveEnum.LEFT)"
         @move-right="sendWebSocket(ActionMoveEnum.RIGHT)"
