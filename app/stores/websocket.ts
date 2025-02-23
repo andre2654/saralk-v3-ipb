@@ -44,7 +44,7 @@ export const useWebsocketStore = defineStore('websocket', {
       this.websocket.close()
       this.websocket = null
 
-      // clearInterval(this.heartBeat)
+      clearInterval(this.heartBeat)
     },
   },
 })

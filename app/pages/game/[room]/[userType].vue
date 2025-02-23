@@ -12,9 +12,14 @@
         @get-board-info="sendWebSocket(ActionMoveEnum.GET_BOARD_INFO)"
         @breadth-first-search="breadthFirstSearchWorker(roomId)"
         @depth-first-search="depthFirstSearchWorker(roomId)"
+        @greedy-search="greedyWorker(roomId)"
+        @a-star-search="aStarWorker(roomId)"
       />
       <MoleculesGameBoard />
-      <MoleculesGameControlZoom class="absolute right-3 top-[100px]" />
+      <MoleculesGameControlZoom
+        v-if="characterStore.currentPlayer?.informed"
+        class="absolute left-3 top-[100px]"
+      />
       <MoleculesGameJoystick
         class="absolute bottom-3 right-3"
         @move-up="sendWebSocket(ActionMoveEnum.TOP)"
@@ -34,6 +39,8 @@ import { TypeResponseEnum } from '@/enums/websocket'
 import {
   breadthFirstSearchWorker,
   depthFirstSearchWorker,
+  greedyWorker,
+  aStarWorker,
 } from '@/utils/workers'
 
 const websocket = useWebsocketStore()

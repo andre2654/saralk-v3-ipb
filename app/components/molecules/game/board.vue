@@ -21,12 +21,13 @@
         class="pointer-events-none -z-10 flex min-w-max select-none"
       >
         <AtomsGameGroundBlock
-          v-for="({ type, isBlocked, points }, xIndex) in boardX"
+          v-for="({ type, isBlocked, points, heuristic }, xIndex) in boardX"
           :key="xIndex"
           :type="type"
           :blocked="isBlocked"
           :position="{ x: xIndex, y: yIndex }"
           :points="points"
+          :heuristic="heuristic"
         />
       </div>
     </div>

@@ -14,7 +14,7 @@
           typeMapping[number]?.bgClass || 'text-sk-color-border bg-gray-900'
         "
       >
-        André Victor
+        {{ name }}
       </div>
     </div>
     <div v-if="isInformed" class="text-sk-color-border">Informado</div>

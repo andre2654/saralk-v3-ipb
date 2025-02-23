@@ -91,6 +91,11 @@ export default defineWebSocketHandler({
       game.markModified('players');
       await game.save()
 
+      // Remove as heurísticas dos blocos do tabuleiro
+      if (!player.informed) {
+        game = game.hideBlocksHeuristics()
+      }
+
       const adjacentBlocks: IAdjacentBlocks = getAdjacentBlocks(
         game.board,
         player
@@ -98,11 +103,13 @@ export default defineWebSocketHandler({
 
       console.log(`Peer conectado à sala: ${roomId}`)
 
+      const currentBlock = game.board[player.position.y][player.position.x]
+
       const responseYourPlayer: IWebsocketResponse = {
         type: TypeResponseEnum.YOUR_PLAYER,
         userId: userId,
         data: player,
-        currentBlock: game.board[player.position.y][player.position.x],
+        currentBlock: currentBlock,
         adjacentBlocks: adjacentBlocks,
       }
 
@@ -187,6 +194,7 @@ export default defineWebSocketHandler({
       }
 
       const game = await Game.findOne({ room: roomId });
+      const gameWithouHeuristics = game.hideBlocksHeuristics()
       if (!game) {
         console.error('Jogo não encontrado na sala');
         peerWithRoom.close();
@@ -205,6 +213,7 @@ export default defineWebSocketHandler({
       const player = game.players.get(userId);
 
       const board = game.board;
+      const boardWithouHeuristics = gameWithouHeuristics.board;
       if (!board) {
         console.error('Tabuleiro não encontrado');
         peerWithRoom.close();
@@ -244,7 +253,7 @@ export default defineWebSocketHandler({
       }
 
       const interactions = {} as IInteractions
-      const adjacentBlocks: IAdjacentBlocks = getAdjacentBlocks(board, player)
+      const adjacentBlocks: IAdjacentBlocks = getAdjacentBlocks(player.informed ? board : boardWithouHeuristics, player)
       var adjacentBlocksAfterMove: IAdjacentBlocks = {} as IAdjacentBlocks
 
       if (messageText === ActionMoveEnum.GET_BOARD_INFO) {
@@ -271,7 +280,6 @@ export default defineWebSocketHandler({
           ActionMoveEnum.DOWN,
         ].includes(messageText)
       ) {
-        const adjacentBlocks = getAdjacentBlocks(board, player)
         const nextBlock = adjacentBlocks[messageText]
 
         if (
@@ -314,7 +322,7 @@ export default defineWebSocketHandler({
           player.position.y = nextBlock.position.y
         }
 
-        adjacentBlocksAfterMove = getAdjacentBlocks(board, player)
+        adjacentBlocksAfterMove = getAdjacentBlocks(player.informed ? board : boardWithouHeuristics, player)
         player.iteractions += 1
       }
 
@@ -322,13 +330,16 @@ export default defineWebSocketHandler({
       game.markModified('players');
       await game.save();
 
+      const currentBlock = player.informed
+        ? board[player.position.y][player.position.x] : boardWithouHeuristics[player.position.y][player.position.x]
+
       const response: IWebsocketResponse = {
         type: TypeResponseEnum.MOVE_PLAYER,
         userId: userId,
         direction: messageText,
         interactions: interactions,
         data: player,
-        currentBlock: board[player.position.y][player.position.x],
+        currentBlock: currentBlock,
         adjacentBlocks: adjacentBlocksAfterMove,
       }
 

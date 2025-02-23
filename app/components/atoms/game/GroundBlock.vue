@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      'relative flex h-sk-height-block w-sk-width-block cursor-pointer items-center justify-center overflow-hidden hover:opacity-40',
+      'h-sk-height-block w-sk-width-block relative flex cursor-pointer items-center justify-center overflow-hidden hover:opacity-40',
       !userIsInformed && !blockIsAdjacent ? 'border-none' : 'border-2',
       blockClass,
     ]"
@@ -17,7 +17,7 @@
     </TransitionFade>
     <div v-if="points" class="relative">
       <span
-        class="absolute left-1/2 top-1/2 z-10 ms-[2.5px] mt-[2px] -translate-x-1/2 -translate-y-1/2 font-sk-font-pixel text-sm text-[#FFEAB4]"
+        class="font-sk-font-pixel absolute left-1/2 top-1/2 z-10 ms-[2.5px] mt-[2px] -translate-x-1/2 -translate-y-1/2 text-sm text-[#FFEAB4]"
         >{{ points }}</span
       >
       <img
@@ -26,6 +26,13 @@
         width="45"
         alt="Bonus object"
       />
+    </div>
+    <div
+      v-if="userIsInformed && !blocked && !blockIsGoal"
+      class="absolute top-0 flex w-full justify-between p-1 text-xs"
+    >
+      <span> C:{{ heuristic.cost }} </span>
+      <div>G:{{ heuristic.distanceAtGoal }}</div>
     </div>
     <div v-if="debug" class="z-10 flex flex-col gap-1 text-white">
       <span>X:{{ position.x }}</span>
@@ -42,9 +49,10 @@
 </template>
 
 <script setup lang="ts">
-import { TransitionFade } from '@morev/vue-transitions'
+import type { IBlockHeuristic } from '@/types/game'
 import { GameBlockTypeEnum } from '@/enums/game'
 import { isAdjacent, isAround } from '@/utils/helpers'
+import { TransitionFade } from '@morev/vue-transitions'
 
 const characterStore = useCharacterStore()
 
@@ -68,6 +76,10 @@ const props = defineProps({
   debug: {
     type: Boolean,
     default: false,
+  },
+  heuristic: {
+    type: Object as PropType<IBlockHeuristic>,
+    default: () => ({}),
   },
 })
 
@@ -151,6 +163,10 @@ const blockIsAround = computed(() => {
       2
     )
   )
+})
+
+const blockIsGoal = computed(() => {
+  return props.type === GameBlockTypeEnum.GOAL
 })
 
 const blockClass = computed(() => {

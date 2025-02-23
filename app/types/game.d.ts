@@ -20,11 +20,17 @@ export interface IPlayer {
   inGame: boolean;
 }
 
+export interface IBlockHeuristic {
+  cost: number;
+  distanceAtGoal: number;
+}
+
 export interface IBlock {
   type: GameBlockTypeEnum;
   isBlocked: boolean;
   points: number;
   position: IPosition;
+  heuristic?: IBlockHeuristic
 }
 
 export type IBoard = IBlock[][];

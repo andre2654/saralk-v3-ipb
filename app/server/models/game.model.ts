@@ -14,6 +14,10 @@ const BlockSchema = new Schema<IBlock>({
     x: { type: Number, required: true },
     y: { type: Number, required: true },
   },
+  heuristic: {
+    cost: { type: Number, required: true },
+    distanceAtGoal: { type: Number, required: true },
+  },
 })
 
 const PlayerSchema = new Schema<IPlayer>(
@@ -47,5 +51,19 @@ const GameSchema = new Schema<IGame & Document>({
   quantityPlayersEntered: { type: Number, default: 0 },
   board: { type: [[BlockSchema]], required: true },
 })
+
+GameSchema.methods.hideBlocksHeuristics = function () {
+  const game = this.toObject(); // Converte o documento para um objeto puro
+
+  if (game.board) {
+    game.board.forEach(row => {
+      row.forEach(block => {
+        delete block.heuristic;
+      });
+    });
+  }
+
+  return game;
+};
 
 export const Game = model<IGame & Document>('Game', GameSchema)
