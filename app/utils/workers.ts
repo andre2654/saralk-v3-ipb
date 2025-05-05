@@ -12,7 +12,7 @@ interface IBlockAndAdjacentBlocks {
 
 // Conexão WebSocket
 const host = window.location.host;
-const connection_url = `ws://${host}/api/websocket?userType=${TypeUserEnum.PLAYER}`;
+const connection_url = `wss://${host}/api/websocket?userType=${TypeUserEnum.PLAYER}`;
 
 // ------------------------------------------------------------------
 // Algoritmo BFS (Busca em Largura)

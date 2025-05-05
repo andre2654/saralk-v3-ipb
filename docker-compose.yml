@@ -1,17 +1,18 @@
-version: '3.8'
 services:
   mongo-db:
     image: mongo:4.4
     container_name: mongo_db
     platform: linux/amd64
     volumes:
-      - mongo-data:/data/db
-    ports:
-      - '${MONGODB_PORT}:${MONGODB_PORT}'
+      - ./mongo-db:/data/db
+    #ports:
+    #  - '${MONGODB_PORT}:${MONGODB_PORT}'
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGODB_DB}
+    networks:
+      - net
 
   nuxt-app:
     container_name: nuxt_app
@@ -19,12 +20,25 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
+    environment:
+      - TZ=Europe/Lisbon
+      - VIRTUAL_HOST=saralk.ipb.pt
+      - VIRTUAL_PATH=/
+      - VIRTUAL_DEST=/
+      - LETSENCRYPT_HOST=saralk.ipb.pt
+      - VIRTUAL_PORT=3000
     env_file:
       - .env
     ports:
       - '3000:3000'
     depends_on:
       - mongo-db
+    networks:
+      - net
 
-volumes:
-  mongo-data:
+#volumes:
+  #mongo-data:
+
+networks:
+  net:
+    external: true
