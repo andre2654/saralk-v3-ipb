@@ -8,10 +8,10 @@
       @click.stop
     >
       <div class="flex flex-col gap-3">
-        <div class="border-b pb-2 font-sk-font-pixel text-[18px] text-white">
+        <div class="font-sk-font-pixel border-b pb-2 text-[18px] text-white">
           Configurações
         </div>
-        <AtomsButton class="w-full">Grafo</AtomsButton>
+        <!-- <AtomsButton class="w-full">Grafo</AtomsButton> -->
         <AtomsButton
           v-if="!characterStore.currentPlayer?.informed"
           @click="emits('getBoardInfo')"
@@ -21,7 +21,7 @@
       </div>
 
       <div class="flex flex-col gap-3">
-        <div class="border-b pb-2 font-sk-font-pixel text-[18px] text-white">
+        <div class="font-sk-font-pixel border-b pb-2 text-[18px] text-white">
           Modo
         </div>
         <div class="grid grid-cols-2 gap-3">

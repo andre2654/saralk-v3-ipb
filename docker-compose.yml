@@ -13,18 +13,18 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGODB_DB}
 
-  # nuxt-app:
-  #   container_name: nuxt_app
-  #   platform: linux/amd64
-  #   build:
-  #     context: ./app
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - '3000:3000'
-  #   depends_on:
-  #     - mongo-db
+  nuxt-app:
+    container_name: nuxt_app
+    platform: linux/amd64
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongo-db
 
 volumes:
   mongo-data:

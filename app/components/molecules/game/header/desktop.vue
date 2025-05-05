@@ -1,15 +1,15 @@
 <template>
   <div class="flex w-full items-center justify-between">
     <div class="flex items-center gap-3 transition">
-      <AtomsButton>Grafo</AtomsButton>
+      <!-- <AtomsButton>Grafo</AtomsButton> -->
       <AtomsButton
         v-if="!characterStore.currentPlayer?.informed"
         @click="emits('getBoardInfo')"
         >Liberar visão</AtomsButton
       >
-      <AtomsPixelatedBox class="border-sk-color-warning text-sk-color-warning"
+      <!-- <AtomsPixelatedBox class="border-sk-color-warning text-sk-color-warning"
         >{{ stopWatchTime }} Restantes</AtomsPixelatedBox
-      >
+      > -->
     </div>
     <div class="flex items-center gap-1">
       <AtomsButton @click="emits('breadthFirstSearch')"

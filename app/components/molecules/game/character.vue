@@ -1,7 +1,7 @@
 <template>
   <div
     :id="`character-container-${userId}`"
-    class="absolute z-[1]"
+    class="absolute z-[3]"
     :class="{
       'cursor-not-allowed opacity-50': !itsMe,
       hidden:

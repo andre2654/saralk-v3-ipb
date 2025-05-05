@@ -12,12 +12,12 @@
         :class="{
           'opacity-80': blockIsAround,
         }"
-        class="absolute left-0 top-0 z-20 h-full w-full bg-black"
+        class="absolute left-0 top-0 z-[2] h-full w-full bg-black"
       />
     </TransitionFade>
     <div v-if="points" class="relative">
       <span
-        class="font-sk-font-pixel absolute left-1/2 top-1/2 z-10 ms-[2.5px] mt-[2px] -translate-x-1/2 -translate-y-1/2 text-sm text-[#FFEAB4]"
+        class="font-sk-font-pixel absolute left-1/2 top-1/2 z-[1] ms-[2.5px] mt-[2px] -translate-x-1/2 -translate-y-1/2 text-sm text-[#FFEAB4]"
         >{{ points }}</span
       >
       <img
@@ -29,18 +29,18 @@
     </div>
     <div
       v-if="userIsInformed && !blocked && !blockIsGoal"
-      class="absolute top-0 flex w-full justify-between p-1 text-xs"
+      class="absolute top-0 z-[1] flex w-full justify-between p-1 text-xs"
     >
       <span> C:{{ heuristic.cost }} </span>
       <div>G:{{ heuristic.distanceAtGoal }}</div>
     </div>
-    <div v-if="debug" class="z-10 flex flex-col gap-1 text-white">
+    <div v-if="debug" class="z-[1] flex flex-col gap-1 text-white">
       <span>X:{{ position.x }}</span>
       <span>Y:{{ position.y }}</span>
     </div>
     <img
       v-if="blocked && blockObjectClass"
-      class="block-object image-pixelated pointer-events-none absolute select-none"
+      class="block-object image-pixelated pointer-events-none absolute z-[1] select-none"
       src="/assets/images/block-objects.png"
       alt="Block object"
       :class="blockObjectClass"
