@@ -1,5 +1,6 @@
 <template>
   <div class="flex w-full flex-col gap-4">
+    <MoleculesGameTreeMap v-if="showGraph" @close="showGraph = false" />
     <MoleculesGameShareButton :roomId="roomId" />
     <div
       class="sk-border-pixelated relative flex h-[600px] w-full flex-col gap-4 overflow-hidden border-2 border-white p-2"
@@ -14,6 +15,7 @@
         @depth-first-search="depthFirstSearchWorker(roomId)"
         @greedy-search="greedyWorker(roomId)"
         @a-star-search="aStarWorker(roomId)"
+        @show-graph="showGraph = true"
       />
       <MoleculesGameBoard />
       <MoleculesGameControlZoom
@@ -57,6 +59,7 @@ const roomId: string = route.params.room as string
 const userType: TypeUserEnum = route.params.userType as TypeUserEnum
 const userName: string | null = route.query.userName as string
 const userId: string | null = route.query.userId as string
+const showGraph = ref(false)
 
 watch(
   () => websocket?.websocket?.data,

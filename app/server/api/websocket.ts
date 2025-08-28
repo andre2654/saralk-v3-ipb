@@ -85,6 +85,11 @@ export default defineWebSocketHandler({
       } else {
         player.peerId = peerId
         player.inGame = true
+        
+        // Inicializa positionsHistory se não existir (para players antigos)
+        if (!player.positionsHistory) {
+          player.positionsHistory = [{ x: player.position.x, y: player.position.y }]
+        }
       }
 
       game.players.set(userId, player)
@@ -320,6 +325,12 @@ export default defineWebSocketHandler({
           player.direction = messageText
           player.position.x = nextBlock.position.x
           player.position.y = nextBlock.position.y
+          
+          // Adiciona a nova posição ao histórico
+          player.positionsHistory.push({
+            x: nextBlock.position.x,
+            y: nextBlock.position.y
+          })
         }
 
         adjacentBlocksAfterMove = getAdjacentBlocks(player.informed ? board : boardWithouHeuristics, player)

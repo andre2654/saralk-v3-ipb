@@ -7,6 +7,7 @@
         @click="emits('getBoardInfo')"
         >Liberar visão</AtomsButton
       >
+      <AtomsButton @click="emits('showGraph')">Mostrar grafo</AtomsButton>
       <!-- <AtomsPixelatedBox class="border-sk-color-warning text-sk-color-warning"
         >{{ stopWatchTime }} Restantes</AtomsPixelatedBox
       > -->
@@ -46,5 +47,6 @@ const emits = defineEmits([
   'depthFirstSearch',
   'greedySearch',
   'aStarSearch',
+  'showGraph',
 ])
 </script>

@@ -18,6 +18,7 @@ export function generatePlayer(lastPlayerId: number, userName: string | null, ty
     points: 0,
     iteractions: 0,
     direction: ActionMoveEnum.RIGHT,
+    positionsHistory: [{ x: 0, y: 0 }], // Inicia com a posição inicial
     inMovement: false,
     movementTimeout: null,
     reachedGoal: false,
