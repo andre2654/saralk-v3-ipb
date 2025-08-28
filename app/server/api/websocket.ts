@@ -299,6 +299,9 @@ export default defineWebSocketHandler({
           const blockType = nextBlock.type
           const blockPoints = nextBlock.points
 
+          // Cria uma cópia do bloco ANTES de modificá-lo
+          const originalBlock = JSON.parse(JSON.stringify(nextBlock))
+
           if (player.type !== TypeUserEnumValue.SPECTATOR) {
             if (blockType === GameBlockTypeEnum.GOAL) {
               player.reachedGoal = true
@@ -313,7 +316,7 @@ export default defineWebSocketHandler({
             }
             if (blockPoints) {
               player.points += blockPoints
-              nextBlock.points = 0
+              nextBlock.points = 0 // Zera os pontos do tabuleiro
 
               interactions[TypeInteractionEnum.GET_POINTS] = <
                 IInteractionGetPoints
@@ -331,8 +334,8 @@ export default defineWebSocketHandler({
           player.position.x = nextBlock.position.x
           player.position.y = nextBlock.position.y
 
-          // Adiciona a nova posição ao histórico com informações completas do bloco
-          player.positionsHistory.push({ ...nextBlock, points: blockPoints })
+          // Adiciona a nova posição ao histórico com o bloco ORIGINAL (antes da modificação)
+          player.positionsHistory.push(originalBlock)
         }
 
         adjacentBlocksAfterMove = getAdjacentBlocks(player.informed ? board : boardWithouHeuristics, player)
