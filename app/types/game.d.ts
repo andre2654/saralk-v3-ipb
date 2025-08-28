@@ -14,7 +14,7 @@ export interface IPlayer {
   points: number;
   iteractions: number;
   direction: ActionMoveEnum;
-  positionsHistory: IPosition[];
+  positionsHistory: IBlock[];
   inMovement: boolean;
   movementTimeout: number | null;
   reachedGoal: boolean;

@@ -74,21 +74,26 @@ export default defineWebSocketHandler({
 
       let player = game.players.get(userId)
       if (!player) {
+        // Pega o bloco inicial do tabuleiro
+        const initialBlock = game.board[0][0]
         player = generatePlayer(
           game.quantityPlayersEntered,
           userName,
           userType,
-          peerId
+          peerId,
+          initialBlock
         )
         game.quantityPlayersEntered += 1
+        game.players[userId] = player
         await game.save()
       } else {
         player.peerId = peerId
         player.inGame = true
-        
+
         // Inicializa positionsHistory se não existir (para players antigos)
         if (!player.positionsHistory) {
-          player.positionsHistory = [{ x: player.position.x, y: player.position.y }]
+          const currentBlock = game.board[player.position.y][player.position.x]
+          player.positionsHistory = [currentBlock]
         }
       }
 
@@ -285,7 +290,7 @@ export default defineWebSocketHandler({
           ActionMoveEnum.DOWN,
         ].includes(messageText)
       ) {
-        const nextBlock = adjacentBlocks[messageText]
+        const nextBlock = adjacentBlocks[messageText as keyof typeof adjacentBlocks]
 
         if (
           nextBlock &&
@@ -325,12 +330,9 @@ export default defineWebSocketHandler({
           player.direction = messageText
           player.position.x = nextBlock.position.x
           player.position.y = nextBlock.position.y
-          
-          // Adiciona a nova posição ao histórico
-          player.positionsHistory.push({
-            x: nextBlock.position.x,
-            y: nextBlock.position.y
-          })
+
+          // Adiciona a nova posição ao histórico com informações completas do bloco
+          player.positionsHistory.push({ ...nextBlock, points: blockPoints })
         }
 
         adjacentBlocksAfterMove = getAdjacentBlocks(player.informed ? board : boardWithouHeuristics, player)

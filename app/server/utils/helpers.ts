@@ -2,10 +2,9 @@ import { GameBlockTypeEnum, ActionMoveEnum, TypeUserEnum as TypeUserEnumValue } 
 import type { IAdjacentBlocks } from '@/types/websocket';
 import type { TypeUserEnum } from '@/enums/game';
 import type { IBlock, IBlockHeuristic, IBoard, IPlayer, IPosition } from '@/types/game';
-import { get } from 'mongoose';
 
 
-export function generatePlayer(lastPlayerId: number, userName: string | null, type: TypeUserEnum, peerId: string): IPlayer {
+export function generatePlayer(lastPlayerId: number, userName: string | null, type: TypeUserEnum, peerId: string, firstBlock: IBlock): IPlayer {
   return {
     peerId: peerId,
     name: userName || lastPlayerId.toString(),
@@ -18,7 +17,7 @@ export function generatePlayer(lastPlayerId: number, userName: string | null, ty
     points: 0,
     iteractions: 0,
     direction: ActionMoveEnum.RIGHT,
-    positionsHistory: [{ x: 0, y: 0 }], // Inicia com a posição inicial
+    positionsHistory: [firstBlock], // Inicia com a posição inicial
     inMovement: false,
     movementTimeout: null,
     reachedGoal: false,

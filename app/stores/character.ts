@@ -45,8 +45,8 @@ export const useCharacterStore = defineStore('character', {
 
       // Atualiza a posição
       this.game.players[userId].position = data.position
-      
-      // Atualiza o histórico de posições
+
+      // Atualiza o histórico de posições se disponível
       if (data.positionsHistory) {
         this.game.players[userId].positionsHistory = data.positionsHistory
       }

@@ -1,18 +1,28 @@
 <template>
-  <div class="fixed left-0 top-0 z-10 flex h-full w-full flex-col bg-gradient-to-br from-gray-900 via-black to-gray-800">
+  <div
+    class="fixed left-0 top-0 z-10 flex h-full w-full flex-col bg-gradient-to-br from-gray-900 via-black to-gray-800"
+  >
     <!-- Header com gradiente -->
     <div class="bg-gradient-to-r from-orange-500 to-red-500 p-6 shadow-2xl">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-white mb-2">🗺️ Movement Tree Map</h1>
-          <p class="text-orange-100 text-sm">
-            Player: <span class="font-semibold">{{ characterStore.currentPlayer?.name || 'No player' }}</span> |
-            Positions: <span class="font-semibold">{{ characterStore.currentPlayer?.positionsHistory?.length || 0 }}</span>
+          <h1 class="mb-2 text-2xl font-bold text-white">
+            🗺️ Movement Tree Map
+          </h1>
+          <p class="text-sm text-orange-100">
+            Player:
+            <span class="font-semibold">{{
+              characterStore.currentPlayer?.name || 'No player'
+            }}</span>
+            | Positions:
+            <span class="font-semibold">{{
+              characterStore.currentPlayer?.positionsHistory?.length || 0
+            }}</span>
           </p>
         </div>
         <button
           @click="emits('close')"
-          class="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white transition-all hover:bg-red-700 hover:scale-105 shadow-lg"
+          class="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white shadow-lg transition-all hover:scale-105 hover:bg-red-700"
         >
           ❌ Close
         </button>
@@ -20,18 +30,18 @@
     </div>
 
     <!-- Controles -->
-    <div class="bg-gray-800/80 backdrop-blur-sm p-4 border-b border-gray-700">
+    <div class="border-b border-gray-700 bg-gray-800/80 p-4 backdrop-blur-sm">
       <div class="flex flex-wrap items-center gap-4">
         <!-- Layout Controls -->
         <div class="flex items-center gap-2">
-          <span class="text-gray-300 text-sm font-medium">Layout:</span>
+          <span class="text-sm font-medium text-gray-300">Layout:</span>
           <button
             @click="updateLayout('LR')"
             :class="[
-              'px-3 py-1 text-xs rounded-md transition-all duration-200',
-              currentLayout === 'LR' 
-                ? 'bg-blue-500 text-white shadow-lg' 
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              'rounded-md px-3 py-1 text-xs transition-all duration-200',
+              currentLayout === 'LR'
+                ? 'bg-blue-500 text-white shadow-lg'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
             ]"
           >
             ↔️ Horizontal
@@ -39,10 +49,10 @@
           <button
             @click="updateLayout('TB')"
             :class="[
-              'px-3 py-1 text-xs rounded-md transition-all duration-200',
-              currentLayout === 'TB' 
-                ? 'bg-blue-500 text-white shadow-lg' 
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              'rounded-md px-3 py-1 text-xs transition-all duration-200',
+              currentLayout === 'TB'
+                ? 'bg-blue-500 text-white shadow-lg'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600',
             ]"
           >
             ↕️ Vertical
@@ -50,20 +60,22 @@
         </div>
 
         <!-- Zoom Controls -->
-        <div class="flex items-center gap-3 flex-1 min-w-[300px]">
-          <span class="text-gray-300 text-sm font-medium">🔍 Zoom:</span>
+        <div class="flex min-w-[300px] flex-1 items-center gap-3">
+          <span class="text-sm font-medium text-gray-300">🔍 Zoom:</span>
           <input
             v-model.number="zoomLevel"
             type="range"
             min="0.1"
             max="16"
             step="0.1"
-            class="flex-1 max-w-xs h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+            class="slider h-2 max-w-xs flex-1 cursor-pointer appearance-none rounded-lg bg-gray-700"
           />
-          <span class="text-orange-400 text-sm font-mono min-w-[50px]">{{ zoomLevel.toFixed(1) }}x</span>
+          <span class="min-w-[50px] font-mono text-sm text-orange-400"
+            >{{ zoomLevel.toFixed(1) }}x</span
+          >
           <button
             @click="resetZoom"
-            class="px-2 py-1 text-xs rounded bg-gray-600 text-gray-200 hover:bg-gray-500 transition-colors"
+            class="rounded bg-gray-600 px-2 py-1 text-xs text-gray-200 transition-colors hover:bg-gray-500"
           >
             🔄 Reset
           </button>
@@ -78,7 +90,7 @@
     </div>
 
     <!-- Graph Area -->
-    <div class="flex-1 relative overflow-hidden">
+    <div class="relative flex-1 overflow-hidden">
       <VNetworkGraph
         ref="graph"
         v-model:zoom-level="zoomLevel"
@@ -88,16 +100,18 @@
         :layouts="layouts"
         :configs="configs"
       />
-      
+
       <!-- Loading/Empty State -->
       <div
         v-if="!characterStore.currentPlayer?.positionsHistory?.length"
         class="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       >
         <div class="text-center">
-          <div class="text-6xl mb-4">🚶‍♂️</div>
-          <h3 class="text-xl text-white mb-2">No Movement History</h3>
-          <p class="text-gray-400">Start moving to see your path visualization</p>
+          <div class="mb-4 text-6xl">🚶‍♂️</div>
+          <h3 class="mb-2 text-xl text-white">No Movement History</h3>
+          <p class="text-gray-400">
+            Start moving to see your path visualization
+          </p>
         </div>
       </div>
     </div>
@@ -111,7 +125,8 @@ import { VNetworkGraph } from 'v-network-graph'
 import 'v-network-graph/lib/style.css'
 import dagre from 'dagre'
 import type { Nodes, Edges, Layouts } from 'v-network-graph'
-import type { IPosition } from '@/types/game'
+import type { IPosition, IBlock } from '@/types/game'
+import { GameBlockTypeEnum } from '@/enums/game'
 
 const characterStore = useCharacterStore()
 
@@ -124,6 +139,52 @@ function resetZoom() {
   zoomLevel.value = 1.0
 }
 
+// Função para obter cores baseadas no tipo do bloco
+function getBlockColors(blockType: GameBlockTypeEnum) {
+  switch (blockType) {
+    case GameBlockTypeEnum.GRASSY_1:
+    case GameBlockTypeEnum.GRASSY_2:
+      return {
+        primary: '#5bea83',
+        secondary: '#27d758',
+        border: '#0e9d1d',
+      }
+    case GameBlockTypeEnum.ROCKY_1:
+    case GameBlockTypeEnum.ROCKY_2:
+      return {
+        primary: '#cbc8c8',
+        secondary: '#b2aaaa',
+        border: '#7d7d7d',
+      }
+    case GameBlockTypeEnum.SANDY_1:
+    case GameBlockTypeEnum.SANDY_2:
+      return {
+        primary: '#d8ce78',
+        secondary: '#c5ba5d',
+        border: '#89771a',
+      }
+    case GameBlockTypeEnum.SWAMPY_1:
+    case GameBlockTypeEnum.SWAMPY_2:
+      return {
+        primary: '#5e7b09',
+        secondary: '#495c10',
+        border: '#404d1d',
+      }
+    case GameBlockTypeEnum.GOAL:
+      return {
+        primary: '#FFD700',
+        secondary: '#FFA500',
+        border: '#FF8C00',
+      }
+    default:
+      return {
+        primary: '#666666',
+        secondary: '#555555',
+        border: '#444444',
+      }
+  }
+}
+
 // Computed para gerar nós automaticamente do histórico
 const computedNodes = computed<Nodes>(() => {
   const player = characterStore.currentPlayer
@@ -133,21 +194,27 @@ const computedNodes = computed<Nodes>(() => {
 
   const newNodes: Nodes = {}
   const positionToNodeId = new Map<string, string>()
-  
+
   // Gerar nós apenas para posições únicas
-  player.positionsHistory.forEach((position: IPosition, index: number) => {
-    const positionKey = `${position.x},${position.y}`
-    
+  player.positionsHistory.forEach((block: IBlock, index: number) => {
+    const positionKey = `${block.position.x},${block.position.y}`
+
     // Se esta posição ainda não foi criada como nó
     if (!positionToNodeId.has(positionKey)) {
       const nodeId = `pos_${positionKey}`
       positionToNodeId.set(positionKey, nodeId)
-      
+
+      const blockColors = getBlockColors(block.type)
+
       newNodes[nodeId] = {
-        name: `(${position.x},${position.y})`,
-        position: position,
+        name: `(${block.position.x},${block.position.y})`,
+        position: { x: block.position.x, y: block.position.y },
+        blockType: block.type,
+        blockColors: blockColors,
+        isBlocked: block.isBlocked,
         step: index,
-        visits: 1
+        visits: 1,
+        points: block.points,
       }
     } else {
       // Se já existe, incrementa o contador de visitas
@@ -155,7 +222,8 @@ const computedNodes = computed<Nodes>(() => {
       if (newNodes[nodeId]) {
         newNodes[nodeId].visits = (newNodes[nodeId].visits || 1) + 1
         // Atualiza o nome para mostrar quantas vezes foi visitado
-        newNodes[nodeId].name = `(${position.x},${position.y}) x${newNodes[nodeId].visits}`
+        newNodes[nodeId].name =
+          `(${block.position.x},${block.position.y}) x${newNodes[nodeId].visits}`
       }
     }
   })
@@ -172,10 +240,10 @@ const computedEdges = computed<Edges>(() => {
 
   const newEdges: Edges = {}
   const positionToNodeId = new Map<string, string>()
-  
+
   // Primeiro, mapear todas as posições para seus IDs de nó
-  player.positionsHistory.forEach((position: IPosition) => {
-    const positionKey = `${position.x},${position.y}`
+  player.positionsHistory.forEach((block: IBlock) => {
+    const positionKey = `${block.position.x},${block.position.y}`
     if (!positionToNodeId.has(positionKey)) {
       const nodeId = `pos_${positionKey}`
       positionToNodeId.set(positionKey, nodeId)
@@ -186,16 +254,16 @@ const computedEdges = computed<Edges>(() => {
   for (let i = 0; i < player.positionsHistory.length - 1; i++) {
     const currentPos = player.positionsHistory[i]
     const nextPos = player.positionsHistory[i + 1]
-    
-    const currentPosKey = `${currentPos.x},${currentPos.y}`
-    const nextPosKey = `${nextPos.x},${nextPos.y}`
-    
+
+    const currentPosKey = `${currentPos.position.x},${currentPos.position.y}`
+    const nextPosKey = `${nextPos.position.x},${nextPos.position.y}`
+
     const sourceNodeId = positionToNodeId.get(currentPosKey)!
     const targetNodeId = positionToNodeId.get(nextPosKey)!
-    
+
     // Criar ID único para a aresta baseado no índice do movimento
     const edgeId = `move_${i}`
-    
+
     newEdges[edgeId] = {
       source: sourceNodeId,
       target: targetNodeId,
@@ -212,75 +280,6 @@ const layouts: Layouts = reactive({
   nodes: {},
 })
 
-// Função para gerar árvore a partir do histórico de posições
-function generateTreeFromHistory() {
-  const player = characterStore.currentPlayer
-  if (!player?.positionsHistory || player.positionsHistory.length === 0) {
-    console.log('Nenhum histórico de posições encontrado')
-    return
-  }
-
-  console.log('Gerando árvore a partir do histórico:', player.positionsHistory)
-
-  // Limpar dados existentes
-  Object.keys(nodes).forEach((key) => delete nodes[key])
-  Object.keys(edges).forEach((key) => delete edges[key])
-
-  // Mapa para rastrear posições únicas e suas IDs de nó
-  const positionToNodeId = new Map<string, string>()
-  
-  // Gerar nós apenas para posições únicas
-  player.positionsHistory.forEach((position: IPosition, index: number) => {
-    const positionKey = `${position.x},${position.y}`
-    
-    // Se esta posição ainda não foi criada como nó
-    if (!positionToNodeId.has(positionKey)) {
-      const nodeId = `pos_${positionKey}`
-      positionToNodeId.set(positionKey, nodeId)
-      
-      nodes[nodeId] = {
-        name: `(${position.x},${position.y})`,
-        position: position,
-        step: index,
-        visits: 1
-      }
-    } else {
-      // Se já existe, incrementa o contador de visitas
-      const nodeId = positionToNodeId.get(positionKey)!
-      if (nodes[nodeId]) {
-        nodes[nodeId].visits = (nodes[nodeId].visits || 1) + 1
-        // Atualiza o nome para mostrar quantas vezes foi visitado
-        nodes[nodeId].name = `(${position.x},${position.y}) x${nodes[nodeId].visits}`
-      }
-    }
-  })
-
-  // Gerar arestas conectando o caminho percorrido
-  for (let i = 0; i < player.positionsHistory.length - 1; i++) {
-    const currentPos = player.positionsHistory[i]
-    const nextPos = player.positionsHistory[i + 1]
-    
-    const currentPosKey = `${currentPos.x},${currentPos.y}`
-    const nextPosKey = `${nextPos.x},${nextPos.y}`
-    
-    const sourceNodeId = positionToNodeId.get(currentPosKey)!
-    const targetNodeId = positionToNodeId.get(nextPosKey)!
-    
-    // Criar ID único para a aresta baseado no índice do movimento
-    const edgeId = `move_${i}`
-    
-    edges[edgeId] = {
-      source: sourceNodeId,
-      target: targetNodeId,
-    }
-  }
-
-  // Aplicar layout automaticamente
-  nextTick(() => {
-    layout('TB')
-  })
-}
-
 const configs = vNG.defineConfigs({
   view: {
     autoPanAndZoomOnLoad: 'fit-content',
@@ -293,7 +292,9 @@ const configs = vNG.defineConfigs({
     selectable: true,
     normal: {
       type: (node) => {
-        // Destacar nós visitados múltiplas vezes com cor diferente
+        // Nós bloqueados ficam com forma diferente
+        if (node.isBlocked) return 'rect'
+        // Destacar nós visitados múltiplas vezes com círculo
         return node.visits && node.visits > 1 ? 'circle' : 'rect'
       },
       width: (node) => {
@@ -303,22 +304,54 @@ const configs = vNG.defineConfigs({
       height: 40,
       borderRadius: 8,
       color: (node) => {
-        // Cor diferente para nós com múltiplas visitas
-        return node.visits && node.visits > 1 ? '#ff3366' : '#ff6f00'
+        if (!node.blockColors) return '#666666'
+
+        // Se o nó foi visitado múltiplas vezes, usa cor secundária
+        if (node.visits && node.visits > 1) {
+          return node.blockColors.secondary
+        }
+
+        // Se o bloco está bloqueado, usa uma versão mais escura
+        if (node.isBlocked) {
+          return node.blockColors.border
+        }
+
+        // Cor normal do bloco
+        return node.blockColors.primary
+      },
+      strokeWidth: 2,
+      strokeColor: (node) => {
+        return node.blockColors?.border || '#333333'
       },
     },
     hover: {
-      color: '#ff5500',
+      color: (node) => {
+        return node.blockColors?.secondary || '#555555'
+      },
       width: (node) => {
         return node.visits && node.visits > 1 ? 84 : 64
       },
       height: 44,
       borderRadius: 8,
+      strokeWidth: 3,
     },
     label: {
       fontSize: 10,
-      color: 'white',
+      color: '#ffffff',
       direction: 'center',
+      fontWeight: 'bold',
+      text: (node) => {
+        // Mostra emoji especial para diferentes tipos de bloco
+        let emoji = ''
+        if (node.blockType === 'goal') emoji = '🎯'
+        else if (node.isBlocked) emoji = '🚫'
+        else if (node.visits > 1) emoji = '🔄'
+        else if (node.points > 0) emoji = '💰'
+
+        console.log(node.points)
+
+        return `${emoji}\n${node.name}`
+      },
     },
   },
   edge: {
@@ -345,8 +378,11 @@ const graph = ref<vNG.VNetworkGraphInstance>()
 function layout(direction: 'TB' | 'LR') {
   const nodesToUse = computedNodes.value
   const edgesToUse = computedEdges.value
-  
-  if (Object.keys(nodesToUse).length <= 1 || Object.keys(edgesToUse).length == 0) {
+
+  if (
+    Object.keys(nodesToUse).length <= 1 ||
+    Object.keys(edgesToUse).length == 0
+  ) {
     return
   }
 
@@ -394,11 +430,15 @@ function updateLayout(direction: 'TB' | 'LR') {
 }
 
 // Watcher para atualizar layout automaticamente quando os dados mudam
-watch([computedNodes, computedEdges], () => {
-  nextTick(() => {
-    layout(currentLayout.value)
-  })
-}, { deep: true })
+watch(
+  [computedNodes, computedEdges],
+  () => {
+    nextTick(() => {
+      layout(currentLayout.value)
+    })
+  },
+  { deep: true }
+)
 
 const emits = defineEmits(['close'])
 </script>
@@ -489,7 +529,8 @@ button:active {
 
 /* Estilo para o estado de loading */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -503,7 +544,11 @@ button:active {
 
 /* Estilo para o grafo */
 .graph {
-  background: radial-gradient(circle at 50% 50%, rgba(31, 41, 55, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(31, 41, 55, 0.8) 0%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
   border-radius: 0 0 1rem 1rem;
 }
 

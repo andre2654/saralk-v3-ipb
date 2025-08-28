@@ -37,10 +37,7 @@ const PlayerSchema = new Schema<IPlayer>(
       enum: Object.values(ActionMoveEnum),
       default: ActionMoveEnum.DOWN,
     },
-    positionsHistory: [{
-      x: { type: Number, required: true },
-      y: { type: Number, required: true },
-    }],
+    positionsHistory: [BlockSchema],
     inMovement: { type: Boolean, default: false },
     movementTimeout: { type: Number, default: null },
     reachedGoal: { type: Boolean, default: false },
