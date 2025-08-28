@@ -5,6 +5,12 @@ import type { IBlock, IBlockHeuristic, IBoard, IPlayer, IPosition } from '@/type
 
 
 export function generatePlayer(lastPlayerId: number, userName: string | null, type: TypeUserEnum, peerId: string, firstBlock: IBlock): IPlayer {
+  // Remove heurística do bloco inicial para evitar problemas no MongoDB
+  const blockForHistory = JSON.parse(JSON.stringify(firstBlock))
+  if (blockForHistory.heuristic) {
+    delete blockForHistory.heuristic
+  }
+
   return {
     peerId: peerId,
     name: userName || lastPlayerId.toString(),
@@ -17,7 +23,7 @@ export function generatePlayer(lastPlayerId: number, userName: string | null, ty
     points: 0,
     iteractions: 0,
     direction: ActionMoveEnum.RIGHT,
-    positionsHistory: [firstBlock], // Inicia com a posição inicial
+    positionsHistory: [blockForHistory], // Inicia com a posição inicial (sem heurística)
     inMovement: false,
     movementTimeout: null,
     reachedGoal: false,

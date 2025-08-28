@@ -15,8 +15,8 @@ const BlockSchema = new Schema<IBlock>({
     y: { type: Number, required: true },
   },
   heuristic: {
-    cost: { type: Number, required: true },
-    distanceAtGoal: { type: Number, required: true },
+    cost: { type: Number, required: false },
+    distanceAtGoal: { type: Number, required: false },
   },
 })
 

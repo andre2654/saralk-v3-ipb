@@ -93,7 +93,12 @@ export default defineWebSocketHandler({
         // Inicializa positionsHistory se não existir (para players antigos)
         if (!player.positionsHistory) {
           const currentBlock = game.board[player.position.y][player.position.x]
-          player.positionsHistory = [currentBlock]
+          const blockForHistory = JSON.parse(JSON.stringify(currentBlock))
+          // Remove heurística para evitar problemas no MongoDB
+          if (blockForHistory.heuristic) {
+            delete blockForHistory.heuristic
+          }
+          player.positionsHistory = [blockForHistory]
         }
       }
 
@@ -301,6 +306,11 @@ export default defineWebSocketHandler({
 
           // Cria uma cópia do bloco ANTES de modificá-lo
           const originalBlock = JSON.parse(JSON.stringify(nextBlock))
+          
+          // Remove a heurística para salvar no histórico (pois é opcional na interface mas estava causando problemas no MongoDB)
+          if (originalBlock.heuristic) {
+            delete originalBlock.heuristic
+          }
 
           if (player.type !== TypeUserEnumValue.SPECTATOR) {
             if (blockType === GameBlockTypeEnum.GOAL) {
