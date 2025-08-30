@@ -348,8 +348,6 @@ const configs = vNG.defineConfigs({
         else if (node.visits > 1) emoji = '🔄'
         else if (node.points > 0) emoji = '💰'
 
-        console.log(node.points)
-
         return `${emoji}\n${node.name}`
       },
     },

@@ -1,4 +1,4 @@
-import type { IPlayer, IPlayers, IGame, IBoard } from '@/types/game';
+import type { IPlayer, IPlayers, IGame, IBoard, IBlocksActive, IPosition } from '@/types/game';
 import type { IInteractions } from '@/types/websocket';
 import type { ActionMoveEnum } from '@/enums/game'
 import { TypeInteractionEnum } from '@/enums/websocket';
@@ -6,11 +6,16 @@ import { TypeInteractionEnum } from '@/enums/websocket';
 interface IState {
   me: string
   game: IGame
+  blocksActive: IBlocksActive[]
 }
 
 export const useCharacterStore = defineStore('character', {
   state: (): IState => {
-    return {} as IState
+    return {
+      me: '',
+      game: {} as IGame,
+      blocksActive: [] as IBlocksActive[]
+    } as IState
   },
   actions: {
     createGame(game: IGame) {
@@ -45,6 +50,23 @@ export const useCharacterStore = defineStore('character', {
 
       // Atualiza a posição
       this.game.players[userId].position = data.position
+
+      // Adiciona o bloco à lista de blocos ativos
+      this.blocksActive.push({
+        playerId: userId,
+        position: data.position,
+        active: true
+      })
+
+      // Desativa o active após 1s
+      setTimeout(() => {
+        this.blocksActive = this.blocksActive.filter(
+          (block) =>
+            !(block.playerId === userId &&
+              (block.position.x === data.position.x &&
+                block.position.y === data.position.y))
+        )
+      }, 3000)
 
       // Atualiza o histórico de posições se disponível
       if (data.positionsHistory) {
@@ -95,6 +117,9 @@ export const useCharacterStore = defineStore('character', {
     },
     currentGame(state): IGame {
       return state.game
+    },
+    allBlocksActive(state): IBlocksActive[] {
+      return state.blocksActive || []
     }
   },
 })
