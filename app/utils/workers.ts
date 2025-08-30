@@ -12,7 +12,7 @@ interface IBlockAndAdjacentBlocks {
 
 // Conexão WebSocket
 const host = window.location.host;
-const connection_url = `ws://${host}/api/websocket?userType=${TypeUserEnum.PLAYER}`;
+const connection_url = `ws://${host}/api/websocket?userType=${TypeUserEnum.BOT}`;
 const WORKERS_DELAY = 1200;
 
 // ------------------------------------------------------------------

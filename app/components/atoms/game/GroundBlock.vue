@@ -4,9 +4,6 @@
       'h-sk-height-block w-sk-width-block relative flex cursor-pointer items-center justify-center overflow-hidden hover:opacity-40',
       !userIsInformed && !blockIsAdjacent ? 'border-none' : 'border-2',
       blockClass,
-      isBlockActive
-        ? 'ring-8 ring-inset ring-[#d5ad57] ring-offset-4 ring-offset-[#c17428]'
-        : 'ring-0',
     ]"
   >
     <TransitionFade>
@@ -180,13 +177,6 @@ const blockClass = computed(() => {
 const blockObjectClass = computed(() => {
   return typeMapping[props.type]?.objectClass || null
 })
-
-const isBlockActive = computed(() =>
-  characterStore.allBlocksActive.some(
-    (b) =>
-      b.position.x === props.position.x && b.position.y === props.position.y
-  )
-)
 </script>
 
 <style scoped>

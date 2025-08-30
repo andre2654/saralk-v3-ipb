@@ -95,7 +95,8 @@ watch(
           response.userId,
           response.direction,
           response.data,
-          response.interactions
+          response.interactions,
+          response.adjacentBlocks
         )
         break
       case TypeResponseEnum.REMOVE_PLAYER:

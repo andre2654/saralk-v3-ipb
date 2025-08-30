@@ -22,5 +22,6 @@ export enum ActionMoveEnum {
 
 export enum TypeUserEnum {
   PLAYER = 'player',
+  BOT = 'bot',
   SPECTATOR = 'spectator'
 }

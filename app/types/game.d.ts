@@ -1,4 +1,5 @@
-import type { GameBlockTypeEnum, TypeUserEnum } from '@/enums/game';
+import type { GameBlockTypeEnum, TypeUserEnum, ActionMoveEnum } from '@/enums/game';
+import type { IAdjacentBlocks } from '@/types/websocket';
 
 export interface IPosition {
   x: number;
@@ -50,8 +51,13 @@ export interface IAllGames {
   [key: string]: IGame;
 }
 
-export interface IBlocksActive {
-  playerId: string;
-  position: IPosition;
+export interface IBlockActive {
+  currentBlock: IBlock;
+  directionToGoHere: ActionMoveEnum;
+  adjacentBlocks: IAdjacentBlocks;
   active: boolean;
+}
+
+export interface IBlocksActive {
+  [key: string]: IBlockActive[];
 }

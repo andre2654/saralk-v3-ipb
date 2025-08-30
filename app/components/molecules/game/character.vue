@@ -1,7 +1,7 @@
 <template>
   <div
     :id="`character-container-${userId}`"
-    class="absolute z-[3]"
+    class="absolute z-[3] hover:opacity-100"
     :class="{
       'cursor-not-allowed opacity-50': !itsMe,
       hidden:
@@ -18,33 +18,116 @@
     :style="containerStyle"
   >
     <div
-      class="absolute -top-[45px] left-[4px] flex min-w-max items-center gap-2"
+      class="absolute left-[4px] flex flex-col gap-3"
+      :class="[
+        character.type === TypeUserEnum.BOT ? '-top-[160px]' : '-top-[45px]',
+      ]"
       @mouseenter="showPointsBar = true"
       @mouseleave="showPointsBar = false"
     >
       <div
-        class="flex items-center gap-1 rounded-full bg-black/70 px-3 py-2 text-white"
-        :class="[itsMe ? 'cursor-help' : 'cursor-not-allowed']"
+        v-if="character.type === TypeUserEnum.BOT"
+        class="flex min-w-max max-w-max flex-col gap-1 overflow-hidden rounded-md bg-black/70 px-3 py-2 text-xs"
       >
-        <div
-          class="h-3 w-3 rounded-full"
-          :class="[character.reachedGoal ? 'bg-sk-color-gold' : 'bg-white']"
-        />
-        <IconEye v-if="character.informed" class="h-4 w-4 fill-white" />
-        {{ character.name }}
-      </div>
-      <TransitionSlide :offset="offsetSlide">
-        <div
-          v-show="showPointsBar"
-          class="flex items-center gap-2 rounded-full bg-black/70 px-3 py-2 text-white"
-        >
-          <span class="text-[#EEE5E0]"> {{ character.points }} pontos </span>
-          <span>-</span>
-          <span class="text-[#EEE5E0]">
-            {{ character.iteractions }} iterações
-          </span>
+        <b class="text-white">DFS - Calculos:</b>
+        <div class="flex flex-col gap-1 text-yellow-500">
+          <div>
+            <span
+              v-if="
+                characterStore.allBlocksActive[userId]?.[0]
+                  ?.directionToGoHere === ActionMoveEnum.TOP
+              "
+              >↑</span
+            >
+            <span
+              v-if="
+                characterStore.allBlocksActive[userId]?.[0]
+                  ?.directionToGoHere === ActionMoveEnum.DOWN
+              "
+              >↓</span
+            >
+            <span
+              v-if="
+                characterStore.allBlocksActive[userId]?.[0]
+                  ?.directionToGoHere === ActionMoveEnum.LEFT
+              "
+              >←</span
+            >
+            <span
+              v-if="
+                characterStore.allBlocksActive[userId]?.[0]
+                  ?.directionToGoHere === ActionMoveEnum.RIGHT
+              "
+              >→</span
+            >
+            Anterior
+          </div>
+          <div>
+            <span
+              v-if="
+                characterStore.allBlocksActive[userId]?.[1]
+                  ?.directionToGoHere === ActionMoveEnum.TOP
+              "
+              >↑</span
+            >
+            <span
+              v-if="
+                characterStore.allBlocksActive[userId]?.[1]
+                  ?.directionToGoHere === ActionMoveEnum.DOWN
+              "
+              >↓</span
+            >
+            <span
+              v-if="
+                characterStore.allBlocksActive[userId]?.[1]
+                  ?.directionToGoHere === ActionMoveEnum.LEFT
+              "
+              >←</span
+            >
+            <span
+              v-if="
+                characterStore.allBlocksActive[userId]?.[1]
+                  ?.directionToGoHere === ActionMoveEnum.RIGHT
+              "
+              >→</span
+            >
+            Atual
+          </div>
         </div>
-      </TransitionSlide>
+        <hr class="-mx-4 opacity-80" />
+        <b class="text-green-500"
+          >Custo do escolhido:
+          {{
+            characterStore.allBlocksActive[userId]?.[1]?.currentBlock.heuristic
+              ?.distanceAtGoal
+          }}
+        </b>
+      </div>
+      <div class="flex min-w-max items-center gap-2">
+        <div
+          class="flex items-center gap-1 rounded-full bg-black/70 px-3 py-2 text-white"
+          :class="[itsMe ? 'cursor-help' : 'cursor-not-allowed']"
+        >
+          <div
+            class="h-3 w-3 rounded-full"
+            :class="[character.reachedGoal ? 'bg-sk-color-gold' : 'bg-white']"
+          />
+          <IconEye v-if="character.informed" class="h-4 w-4 fill-white" />
+          {{ character.name }}
+        </div>
+        <TransitionSlide :offset="offsetSlide">
+          <div
+            v-show="showPointsBar"
+            class="flex items-center gap-2 rounded-full bg-black/70 px-3 py-2 text-white"
+          >
+            <span class="text-[#EEE5E0]"> {{ character.points }} pontos </span>
+            <span>-</span>
+            <span class="text-[#EEE5E0]">
+              {{ character.iteractions }} iterações
+            </span>
+          </div>
+        </TransitionSlide>
+      </div>
     </div>
     <div
       id="character"

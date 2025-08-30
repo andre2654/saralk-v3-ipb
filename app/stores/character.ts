@@ -1,12 +1,12 @@
-import type { IPlayer, IPlayers, IGame, IBoard, IBlocksActive, IPosition } from '@/types/game';
-import type { IInteractions } from '@/types/websocket';
+import type { IPlayer, IPlayers, IGame, IBoard, IBlockActive, IBlocksActive } from '@/types/game';
+import type { IInteractions, IAdjacentBlocks } from '@/types/websocket';
 import type { ActionMoveEnum } from '@/enums/game'
 import { TypeInteractionEnum } from '@/enums/websocket';
 
 interface IState {
   me: string
   game: IGame
-  blocksActive: IBlocksActive[]
+  blocksActive: IBlocksActive
 }
 
 export const useCharacterStore = defineStore('character', {
@@ -14,7 +14,7 @@ export const useCharacterStore = defineStore('character', {
     return {
       me: '',
       game: {} as IGame,
-      blocksActive: [] as IBlocksActive[]
+      blocksActive: {} as IBlocksActive
     } as IState
   },
   actions: {
@@ -28,7 +28,7 @@ export const useCharacterStore = defineStore('character', {
       this.me = userId
       this.game.players[userId] = player
     },
-    move(userId: string, direction: ActionMoveEnum, data: IPlayer, interactions: IInteractions) {
+    move(userId: string, direction: ActionMoveEnum, data: IPlayer, interactions: IInteractions, adjacentBlocks: IAdjacentBlocks) {
       const player = this.game.players[userId]
 
       player.direction = direction
@@ -52,21 +52,24 @@ export const useCharacterStore = defineStore('character', {
       this.game.players[userId].position = data.position
 
       // Adiciona o bloco à lista de blocos ativos
-      this.blocksActive.push({
-        playerId: userId,
-        position: data.position,
-        active: true
-      })
+      // Remove all previous active blocks for the same user
+      this.blocksActive[userId] = this.blocksActive[userId] || [];
+      let lastActiveBlock: IBlockActive | undefined = this.blocksActive[userId].find(block => block.active);
 
-      // Desativa o active após 1s
-      setTimeout(() => {
-        this.blocksActive = this.blocksActive.filter(
-          (block) =>
-            !(block.playerId === userId &&
-              (block.position.x === data.position.x &&
-                block.position.y === data.position.y))
-        )
-      }, 3000)
+      if (
+        lastActiveBlock
+      ) {
+        lastActiveBlock.active = false
+        this.blocksActive[userId] = [lastActiveBlock]
+      }
+
+      // Add the new active block
+      this.blocksActive[userId].push({
+        currentBlock: this.game.board[data.position.y][data.position.x],
+        adjacentBlocks: adjacentBlocks,
+        directionToGoHere: direction,
+        active: true
+      });
 
       // Atualiza o histórico de posições se disponível
       if (data.positionsHistory) {
@@ -118,8 +121,8 @@ export const useCharacterStore = defineStore('character', {
     currentGame(state): IGame {
       return state.game
     },
-    allBlocksActive(state): IBlocksActive[] {
-      return state.blocksActive || []
+    allBlocksActive(state): IBlocksActive {
+      return state.blocksActive || {}
     }
   },
 })
