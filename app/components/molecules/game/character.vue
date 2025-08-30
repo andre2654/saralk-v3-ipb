@@ -3,7 +3,7 @@
     :id="`character-container-${userId}`"
     class="absolute z-[3] hover:opacity-100"
     :class="{
-      'cursor-not-allowed opacity-50': !itsMe,
+      'cursor-not-allowed opacity-50': !itsMe && !seeDecisionHelp,
       hidden:
         characterStore.currentPlayer &&
         !itsMe &&
@@ -17,29 +17,38 @@
     }"
     :style="containerStyle"
   >
+    <MoleculesGameCharacterDecisionHelp
+      class="absolute -left-[200px] -top-[45px]"
+      v-if="seeDecisionHelp"
+      :player-name="character.name"
+      :block-active="characterStore.allBlocksActive[userId]"
+    />
+
     <div
-      class="absolute left-[4px] flex flex-col gap-3"
-      :class="[
-        character.type === TypeUserEnum.BOT ? '-top-[160px]' : '-top-[45px]',
-      ]"
+      class="absolute -top-[45px] left-[4px] flex flex-col gap-3"
       @mouseenter="showPointsBar = true"
       @mouseleave="showPointsBar = false"
     >
-      <MoleculesGameCharacterDecisionHelp
-        v-if="character.type === TypeUserEnum.BOT"
-        :player-name="character.name"
-        :block-active="characterStore.allBlocksActive[userId]"
-      />
       <div class="flex min-w-max items-center gap-2">
         <div
-          class="flex items-center gap-1 rounded-full bg-black/70 px-3 py-2 text-white"
+          class="flex h-[40px] items-center gap-1 overflow-hidden rounded-full bg-black/70 px-3 py-2 text-white"
           :class="[itsMe ? 'cursor-help' : 'cursor-not-allowed']"
         >
+          <template v-if="character.type === TypeUserEnum.BOT">
+            <button
+              v-text="seeDecisionHelp ? '-' : '+'"
+              @click="seeDecisionHelp = !seeDecisionHelp"
+            />
+
+            <hr class="opa h-[100px] w-1 border-r border-white" />
+          </template>
+
           <div
             class="h-3 w-3 rounded-full"
             :class="[character.reachedGoal ? 'bg-sk-color-gold' : 'bg-white']"
           />
           <IconEye v-if="character.informed" class="h-4 w-4 fill-white" />
+
           {{ character.name }}
         </div>
         <TransitionSlide :offset="offsetSlide">
@@ -78,6 +87,8 @@ import IconEye from '@/public/assets/icons/icon-eye.svg'
 import { TransitionSlide } from '@morev/vue-transitions'
 
 const characterStore = useCharacterStore()
+
+const seeDecisionHelp = ref(false)
 
 const props = defineProps({
   userId: {
