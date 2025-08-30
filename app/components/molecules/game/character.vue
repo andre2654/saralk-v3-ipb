@@ -25,84 +25,11 @@
       @mouseenter="showPointsBar = true"
       @mouseleave="showPointsBar = false"
     >
-      <div
+      <MoleculesGameCharacterDecisionHelp
         v-if="character.type === TypeUserEnum.BOT"
-        class="flex min-w-max max-w-max flex-col gap-1 overflow-hidden rounded-md bg-black/70 px-3 py-2 text-xs"
-      >
-        <b class="text-white">DFS - Calculos:</b>
-        <div class="flex flex-col gap-1 text-yellow-500">
-          <div>
-            <span
-              v-if="
-                characterStore.allBlocksActive[userId]?.[0]
-                  ?.directionToGoHere === ActionMoveEnum.TOP
-              "
-              >↑</span
-            >
-            <span
-              v-if="
-                characterStore.allBlocksActive[userId]?.[0]
-                  ?.directionToGoHere === ActionMoveEnum.DOWN
-              "
-              >↓</span
-            >
-            <span
-              v-if="
-                characterStore.allBlocksActive[userId]?.[0]
-                  ?.directionToGoHere === ActionMoveEnum.LEFT
-              "
-              >←</span
-            >
-            <span
-              v-if="
-                characterStore.allBlocksActive[userId]?.[0]
-                  ?.directionToGoHere === ActionMoveEnum.RIGHT
-              "
-              >→</span
-            >
-            Anterior
-          </div>
-          <div>
-            <span
-              v-if="
-                characterStore.allBlocksActive[userId]?.[1]
-                  ?.directionToGoHere === ActionMoveEnum.TOP
-              "
-              >↑</span
-            >
-            <span
-              v-if="
-                characterStore.allBlocksActive[userId]?.[1]
-                  ?.directionToGoHere === ActionMoveEnum.DOWN
-              "
-              >↓</span
-            >
-            <span
-              v-if="
-                characterStore.allBlocksActive[userId]?.[1]
-                  ?.directionToGoHere === ActionMoveEnum.LEFT
-              "
-              >←</span
-            >
-            <span
-              v-if="
-                characterStore.allBlocksActive[userId]?.[1]
-                  ?.directionToGoHere === ActionMoveEnum.RIGHT
-              "
-              >→</span
-            >
-            Atual
-          </div>
-        </div>
-        <hr class="-mx-4 opacity-80" />
-        <b class="text-green-500"
-          >Custo do escolhido:
-          {{
-            characterStore.allBlocksActive[userId]?.[1]?.currentBlock.heuristic
-              ?.distanceAtGoal
-          }}
-        </b>
-      </div>
+        :player-name="character.name"
+        :block-active="characterStore.allBlocksActive[userId]"
+      />
       <div class="flex min-w-max items-center gap-2">
         <div
           class="flex items-center gap-1 rounded-full bg-black/70 px-3 py-2 text-white"
