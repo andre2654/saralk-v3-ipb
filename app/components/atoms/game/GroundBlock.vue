@@ -4,6 +4,7 @@
       'h-sk-height-block w-sk-width-block relative flex cursor-pointer items-center justify-center overflow-hidden hover:opacity-40',
       !userIsInformed && !blockIsAdjacent ? 'border-none' : 'border-2',
       blockClass,
+      isBlockActive ? 'ring-8 ring-inset ring-yellow-400' : 'ring-0',
     ]"
   >
     <TransitionFade>
@@ -31,7 +32,7 @@
       v-if="userIsInformed && !blocked && !blockIsGoal"
       class="absolute top-0 z-[1] flex w-full justify-between p-1 text-xs"
     >
-      <span> C:{{ heuristic.cost }} </span>
+      <span> C:{{ heuristic.cost }}</span>
       <div>G:{{ heuristic.distanceAtGoal }}</div>
     </div>
     <div v-if="debug" class="z-[1] flex flex-col gap-1 text-white">
@@ -177,6 +178,13 @@ const blockClass = computed(() => {
 const blockObjectClass = computed(() => {
   return typeMapping[props.type]?.objectClass || null
 })
+
+const isBlockActive = computed(() =>
+  characterStore.allBlocksActive.some(
+    (b) =>
+      b.position.x === props.position.x && b.position.y === props.position.y
+  )
+)
 </script>
 
 <style scoped>

@@ -71,11 +71,11 @@ watch(
 
     switch (type) {
       case TypeResponseEnum.NEW_PLAYER:
-        console.log('NEW_PLAYER')
+        // console.log('NEW_PLAYER')
         addPlayer(response.userId, response.data)
         break
       case TypeResponseEnum.YOUR_PLAYER:
-        console.log('YOUR_PLAYER', response)
+        // console.log('YOUR_PLAYER', response)
 
         if (!userId) {
           router.push({
@@ -86,11 +86,11 @@ watch(
         addMe(response.userId, response.data)
         break
       case TypeResponseEnum.GAME_INFO:
-        console.log('GAME_INFO')
+        // console.log('GAME_INFO')
         createGame(response.data)
         break
       case TypeResponseEnum.MOVE_PLAYER:
-        console.log('MOVE_PLAYER', response)
+        // console.log('MOVE_PLAYER', response)
         move(
           response.userId,
           response.direction,
@@ -99,15 +99,15 @@ watch(
         )
         break
       case TypeResponseEnum.REMOVE_PLAYER:
-        console.log('REMOVE_PLAYER')
+        // console.log('REMOVE_PLAYER')
         // removePlayer(response.userId)
         break
       case TypeResponseEnum.BOARD_INFO:
-        console.log('BOARD_INFO')
+        // console.log('BOARD_INFO')
         addBoardInfo(response.board, response.userId)
         break
       case TypeResponseEnum.INVALID_ACTION:
-        console.log(response.message)
+        // console.log(response.message)
         break
     }
   }

@@ -49,3 +49,9 @@ export interface IGame {
 export interface IAllGames {
   [key: string]: IGame;
 }
+
+export interface IBlocksActive {
+  playerId: string;
+  position: IPosition;
+  active: boolean;
+}
