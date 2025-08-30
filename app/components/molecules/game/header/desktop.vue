@@ -8,9 +8,9 @@
         >Liberar visão</AtomsButton
       >
       <AtomsButton @click="emits('showGraph')">Mostrar grafo</AtomsButton>
-      <!-- <AtomsPixelatedBox class="border-sk-color-warning text-sk-color-warning"
+      <AtomsPixelatedBox class="border-sk-color-warning text-sk-color-warning"
         >{{ stopWatchTime }} Restantes</AtomsPixelatedBox
-      > -->
+      >
     </div>
     <div class="flex items-center gap-1">
       <AtomsButton @click="emits('breadthFirstSearch')"
