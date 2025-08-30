@@ -11,13 +11,13 @@
         <div class="font-sk-font-pixel border-b pb-2 text-[18px] text-white">
           Configurações
         </div>
-        <!-- <AtomsButton class="w-full">Grafo</AtomsButton> -->
         <AtomsButton
           v-if="!characterStore.currentPlayer?.informed"
           @click="emits('getBoardInfo')"
           class="w-full"
           >Liberar visão</AtomsButton
         >
+        <AtomsButton @click="emits('showGraph')">Mostrar grafo</AtomsButton>
       </div>
 
       <div class="flex flex-col gap-3">
@@ -65,5 +65,6 @@ const emits = defineEmits([
   'depthFirstSearch',
   'greedySearch',
   'aStarSearch',
+  'showGraph',
 ])
 </script>

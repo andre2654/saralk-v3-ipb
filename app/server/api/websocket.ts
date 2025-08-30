@@ -74,17 +74,32 @@ export default defineWebSocketHandler({
 
       let player = game.players.get(userId)
       if (!player) {
+        // Pega o bloco inicial do tabuleiro
+        const initialBlock = game.board[0][0]
         player = generatePlayer(
           game.quantityPlayersEntered,
           userName,
           userType,
-          peerId
+          peerId,
+          initialBlock
         )
         game.quantityPlayersEntered += 1
+        game.players[userId] = player
         await game.save()
       } else {
         player.peerId = peerId
         player.inGame = true
+
+        // Inicializa positionsHistory se não existir (para players antigos)
+        if (!player.positionsHistory) {
+          const currentBlock = game.board[player.position.y][player.position.x]
+          const blockForHistory = JSON.parse(JSON.stringify(currentBlock))
+          // Remove heurística para evitar problemas no MongoDB
+          if (blockForHistory.heuristic) {
+            delete blockForHistory.heuristic
+          }
+          player.positionsHistory = [blockForHistory]
+        }
       }
 
       game.players.set(userId, player)
@@ -280,7 +295,7 @@ export default defineWebSocketHandler({
           ActionMoveEnum.DOWN,
         ].includes(messageText)
       ) {
-        const nextBlock = adjacentBlocks[messageText]
+        const nextBlock = adjacentBlocks[messageText as keyof typeof adjacentBlocks]
 
         if (
           nextBlock &&
@@ -288,6 +303,14 @@ export default defineWebSocketHandler({
         ) {
           const blockType = nextBlock.type
           const blockPoints = nextBlock.points
+
+          // Cria uma cópia do bloco ANTES de modificá-lo
+          const originalBlock = JSON.parse(JSON.stringify(nextBlock))
+          
+          // Remove a heurística para salvar no histórico (pois é opcional na interface mas estava causando problemas no MongoDB)
+          if (originalBlock.heuristic) {
+            delete originalBlock.heuristic
+          }
 
           if (player.type !== TypeUserEnumValue.SPECTATOR) {
             if (blockType === GameBlockTypeEnum.GOAL) {
@@ -303,7 +326,7 @@ export default defineWebSocketHandler({
             }
             if (blockPoints) {
               player.points += blockPoints
-              nextBlock.points = 0
+              nextBlock.points = 0 // Zera os pontos do tabuleiro
 
               interactions[TypeInteractionEnum.GET_POINTS] = <
                 IInteractionGetPoints
@@ -320,6 +343,9 @@ export default defineWebSocketHandler({
           player.direction = messageText
           player.position.x = nextBlock.position.x
           player.position.y = nextBlock.position.y
+
+          // Adiciona a nova posição ao histórico com o bloco ORIGINAL (antes da modificação)
+          player.positionsHistory.push(originalBlock)
         }
 
         adjacentBlocksAfterMove = getAdjacentBlocks(player.informed ? board : boardWithouHeuristics, player)

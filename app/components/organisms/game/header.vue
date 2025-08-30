@@ -8,6 +8,7 @@
       @depth-first-search="emits('depthFirstSearch')"
       @greedy-search="emits('greedySearch')"
       @a-star-search="emits('aStarSearch')"
+      @show-graph="emits('showGraph')"
     />
     <AtomsButton class="xl:hidden" @click="interfaceStore.showSideMenu">
       <IconMenu class="h-5 w-auto" />
@@ -21,6 +22,7 @@
       @depth-first-search="emits('depthFirstSearch')"
       @greedy-search="emits('greedySearch')"
       @a-star-search="emits('aStarSearch')"
+      @show-graph="emits('showGraph')"
     />
   </div>
 </template>
@@ -41,5 +43,6 @@ const emits = defineEmits([
   'depthFirstSearch',
   'greedySearch',
   'aStarSearch',
+  'showGraph',
 ])
 </script>

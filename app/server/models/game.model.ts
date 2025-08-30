@@ -15,8 +15,8 @@ const BlockSchema = new Schema<IBlock>({
     y: { type: Number, required: true },
   },
   heuristic: {
-    cost: { type: Number, required: true },
-    distanceAtGoal: { type: Number, required: true },
+    cost: { type: Number, required: false },
+    distanceAtGoal: { type: Number, required: false },
   },
 })
 
@@ -37,6 +37,7 @@ const PlayerSchema = new Schema<IPlayer>(
       enum: Object.values(ActionMoveEnum),
       default: ActionMoveEnum.DOWN,
     },
+    positionsHistory: [BlockSchema],
     inMovement: { type: Boolean, default: false },
     movementTimeout: { type: Number, default: null },
     reachedGoal: { type: Boolean, default: false },

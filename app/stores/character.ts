@@ -34,7 +34,6 @@ export const useCharacterStore = defineStore('character', {
         player.inMovement = true
       }
 
-
       if (player.movementTimeout) {
         clearTimeout(player.movementTimeout)
       }
@@ -44,7 +43,13 @@ export const useCharacterStore = defineStore('character', {
         player.movementTimeout = null
       }, 350)
 
+      // Atualiza a posição
       this.game.players[userId].position = data.position
+
+      // Atualiza o histórico de posições se disponível
+      if (data.positionsHistory) {
+        this.game.players[userId].positionsHistory = data.positionsHistory
+      }
 
       player.iteractions = data.iteractions
 

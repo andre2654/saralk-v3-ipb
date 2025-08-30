@@ -16,15 +16,19 @@
     "@pinia/nuxt": "0.5.5",
     "@vueuse/core": "11.1.0",
     "crossws": "0.3.1",
+    "dagre": "^0.8.5",
     "mongoose": "8.10.0",
     "uuid": "10.0.0",
+    "v-network-graph": "^0.9.21",
     "vite-svg-loader": "5.1.0",
     "vue": "3.5.11",
     "vue-dragscroll": "4.0.6",
-    "vue-router": "4.4.5"
+    "vue-router": "4.4.5",
+    "vue-tree-chart-3": "^1.2.9"
   },
   "devDependencies": {
     "@nuxt/eslint": "0.5.7",
+    "@types/dagre": "^0.7.53",
     "@types/uuid": "10.0.0",
     "nuxt": "3.15.3",
     "prettier": "3.3.3",
