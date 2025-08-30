@@ -116,7 +116,7 @@ export default defineWebSocketHandler({
         player
       )
 
-      console.log(`Peer conectado à sala: ${roomId}`)
+      // console.log(`Peer conectado à sala: ${roomId}`)
 
       const currentBlock = game.board[player.position.y][player.position.x]
 
@@ -187,7 +187,7 @@ export default defineWebSocketHandler({
     // Envia a mensagem para todos os peers na sala
     peer.publish(roomId, JSON.stringify(responseRemovePlayer))
 
-    console.log(`Conexão fechada (Peer ID: ${userId})`)
+    // console.log(`Conexão fechada (Peer ID: ${userId})`)
   },
 
   error(peer, error) {
@@ -217,7 +217,7 @@ export default defineWebSocketHandler({
       }
 
       const messageText = message.text() as ActionMoveEnum
-      console.log(`Mensagem recebida: ${messageText}`)
+      // console.log(`Mensagem recebida: ${messageText}`)
 
       if (!userId) {
         console.error('Jogador não encontrado');

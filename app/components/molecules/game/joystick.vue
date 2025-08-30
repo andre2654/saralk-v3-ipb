@@ -13,7 +13,6 @@
           src="/assets/images/character-picture.png"
           alt="Character picture"
         />
-        {{ characterIsNotInViewport }}
       </AtomsButton>
       <AtomsButton @click="emits('moveRight')" class="h-[55px] w-[55px]">
         <IconArrowRight />
@@ -31,10 +30,8 @@ import IconArrowUp from '@/public/assets/icons/icon-arrow-up.svg'
 import IconArrowDown from '@/public/assets/icons/icon-arrow-down.svg'
 import IconArrowLeft from '@/public/assets/icons/icon-arrow-left.svg'
 import IconArrowRight from '@/public/assets/icons/icon-arrow-right.svg'
-import { set } from 'mongoose'
 
 const characterStore = useCharacterStore()
-const interfaceStore = useInterfaceStore()
 
 const emits = defineEmits(['moveUp', 'moveLeft', 'moveRight', 'moveDown'])
 

@@ -4,7 +4,9 @@
       'h-sk-height-block w-sk-width-block relative flex cursor-pointer items-center justify-center overflow-hidden hover:opacity-40',
       !userIsInformed && !blockIsAdjacent ? 'border-none' : 'border-2',
       blockClass,
-      isBlockActive ? 'ring-8 ring-inset ring-yellow-400' : 'ring-0',
+      isBlockActive
+        ? 'ring-8 ring-inset ring-[#d5ad57] ring-offset-4 ring-offset-[#c17428]'
+        : 'ring-0',
     ]"
   >
     <TransitionFade>

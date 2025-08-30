@@ -18,7 +18,7 @@
     :style="containerStyle"
   >
     <div
-      class="absolute -top-[45px] left-0 flex min-w-max items-center gap-2"
+      class="absolute -top-[45px] left-[4px] flex min-w-max items-center gap-2"
       @mouseenter="showPointsBar = true"
       @mouseleave="showPointsBar = false"
     >

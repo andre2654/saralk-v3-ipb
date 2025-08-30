@@ -3,12 +3,10 @@
     class="fixed left-0 top-0 z-10 flex h-full w-full flex-col bg-gradient-to-br from-gray-900 via-black to-gray-800"
   >
     <!-- Header com gradiente -->
-    <div class="bg-gradient-to-r from-orange-500 to-red-500 p-6 shadow-2xl">
+    <div class="bg-gradient-to-r from-[#d5ad57] to-[#c17428] p-6 shadow-2xl">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="mb-2 text-2xl font-bold text-white">
-            🗺️ Movement Tree Map
-          </h1>
+          <h1 class="mb-2 text-2xl font-bold text-white">GRAFO</h1>
           <p class="text-sm text-orange-100">
             Player:
             <span class="font-semibold">{{
@@ -22,7 +20,7 @@
         </div>
         <button
           @click="emits('close')"
-          class="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white shadow-lg transition-all hover:scale-105 hover:bg-red-700"
+          class="flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-white shadow-lg transition-all hover:scale-105"
         >
           ❌ Close
         </button>
