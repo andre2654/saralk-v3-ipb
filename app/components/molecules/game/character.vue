@@ -1,9 +1,9 @@
 <template>
   <div
     :id="`character-container-${userId}`"
-    class="absolute z-[3]"
+    class="absolute z-[3] hover:opacity-100"
     :class="{
-      'cursor-not-allowed opacity-50': !itsMe,
+      'cursor-not-allowed opacity-50': !itsMe && !seeDecisionHelp,
       hidden:
         characterStore.currentPlayer &&
         !itsMe &&
@@ -17,34 +17,53 @@
     }"
     :style="containerStyle"
   >
+    <MoleculesGameCharacterDecisionHelp
+      class="absolute -left-[200px] -top-[45px]"
+      v-if="seeDecisionHelp"
+      :player-name="character.name"
+      :block-active="characterStore.allBlocksActive[userId]"
+    />
+
     <div
-      class="absolute -top-[45px] left-0 flex min-w-max items-center gap-2"
+      class="absolute -top-[45px] left-[4px] flex flex-col gap-3"
       @mouseenter="showPointsBar = true"
       @mouseleave="showPointsBar = false"
     >
-      <div
-        class="flex items-center gap-1 rounded-full bg-black/70 px-3 py-2 text-white"
-        :class="[itsMe ? 'cursor-help' : 'cursor-not-allowed']"
-      >
+      <div class="flex min-w-max items-center gap-2">
         <div
-          class="h-3 w-3 rounded-full"
-          :class="[character.reachedGoal ? 'bg-sk-color-gold' : 'bg-white']"
-        />
-        <IconEye v-if="character.informed" class="h-4 w-4 fill-white" />
-        {{ character.name }}
-      </div>
-      <TransitionSlide :offset="offsetSlide">
-        <div
-          v-show="showPointsBar"
-          class="flex items-center gap-2 rounded-full bg-black/70 px-3 py-2 text-white"
+          class="flex h-[40px] items-center gap-1 overflow-hidden rounded-full bg-black/70 px-3 py-2 text-white"
+          :class="[itsMe ? 'cursor-help' : 'cursor-not-allowed']"
         >
-          <span class="text-[#EEE5E0]"> {{ character.points }} pontos </span>
-          <span>-</span>
-          <span class="text-[#EEE5E0]">
-            {{ character.iteractions }} iterações
-          </span>
+          <template v-if="character.type === TypeUserEnum.BOT">
+            <button
+              v-text="seeDecisionHelp ? '-' : '+'"
+              @click="seeDecisionHelp = !seeDecisionHelp"
+            />
+
+            <hr class="opa h-[100px] w-1 border-r border-white" />
+          </template>
+
+          <div
+            class="h-3 w-3 rounded-full"
+            :class="[character.reachedGoal ? 'bg-sk-color-gold' : 'bg-white']"
+          />
+          <IconEye v-if="character.informed" class="h-4 w-4 fill-white" />
+
+          {{ character.name }}
         </div>
-      </TransitionSlide>
+        <TransitionSlide :offset="offsetSlide">
+          <div
+            v-show="showPointsBar"
+            class="flex items-center gap-2 rounded-full bg-black/70 px-3 py-2 text-white"
+          >
+            <span class="text-[#EEE5E0]"> {{ character.points }} pontos </span>
+            <span>-</span>
+            <span class="text-[#EEE5E0]">
+              {{ character.iteractions }} iterações
+            </span>
+          </div>
+        </TransitionSlide>
+      </div>
     </div>
     <div
       id="character"
@@ -68,6 +87,8 @@ import IconEye from '@/public/assets/icons/icon-eye.svg'
 import { TransitionSlide } from '@morev/vue-transitions'
 
 const characterStore = useCharacterStore()
+
+const seeDecisionHelp = ref(false)
 
 const props = defineProps({
   userId: {

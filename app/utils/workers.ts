@@ -12,7 +12,8 @@ interface IBlockAndAdjacentBlocks {
 
 // Conexão WebSocket
 const host = window.location.host;
-const connection_url = `ws://${host}/api/websocket?userType=${TypeUserEnum.PLAYER}`;
+const connection_url = `ws://${host}/api/websocket?userType=${TypeUserEnum.BOT}`;
+const WORKERS_DELAY = 1200;
 
 // ------------------------------------------------------------------
 // Algoritmo BFS (Busca em Largura)
@@ -109,7 +110,7 @@ export async function breadthFirstSearchWorker(roomId: string) {
   // WebSocket 'data' watch
   // ------------------------------------------------------------------
   watch(data, async (value) => {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, WORKERS_DELAY));
 
     if (!value) return;
 
@@ -118,11 +119,11 @@ export async function breadthFirstSearchWorker(roomId: string) {
 
     switch (type) {
       case TypeResponseEnum.NEW_PLAYER:
-        console.log('NEW_PLAYER');
+        // console.log('NEW_PLAYER');
         break;
 
       case TypeResponseEnum.YOUR_PLAYER: {
-        console.log('YOUR_PLAYER', response);
+        // console.log('YOUR_PLAYER', response);
         workerId = response.userId;
 
         const adjacentBlocks = response.adjacentBlocks;
@@ -140,7 +141,7 @@ export async function breadthFirstSearchWorker(roomId: string) {
         const bestMove = consumeNextQueue(adjacentBlocks);
 
         if (bestMove === ActionMoveEnum.MOVEMENT_NOT_FOUND || !bestMove) {
-          console.log('Movimento não encontrado. Encerrando...');
+          // console.log('Movimento não encontrado. Encerrando...');
           close();
           return;
         } else {
@@ -150,11 +151,11 @@ export async function breadthFirstSearchWorker(roomId: string) {
       }
 
       case TypeResponseEnum.GAME_INFO:
-        console.log('GAME_INFO');
+        // console.log('GAME_INFO');
         break;
 
       case TypeResponseEnum.MOVE_PLAYER: {
-        console.log('MOVE_PLAYER', response);
+        // console.log('MOVE_PLAYER', response);
 
         if (response.userId !== workerId) return;
 
@@ -178,7 +179,7 @@ export async function breadthFirstSearchWorker(roomId: string) {
         const bestMove = consumeNextQueue(adjacentBlocks);
 
         if (bestMove === ActionMoveEnum.MOVEMENT_NOT_FOUND || !bestMove) {
-          console.log('Movimento não encontrado. Encerrando...');
+          // console.log('Movimento não encontrado. Encerrando...');
           close();
           return;
         } else {
@@ -188,15 +189,15 @@ export async function breadthFirstSearchWorker(roomId: string) {
       }
 
       case TypeResponseEnum.REMOVE_PLAYER:
-        console.log('REMOVE_PLAYER');
+        // console.log('REMOVE_PLAYER');
         break;
 
       case TypeResponseEnum.BOARD_INFO:
-        console.log('BOARD_INFO');
+        // console.log('BOARD_INFO');
         break;
 
       case TypeResponseEnum.INVALID_ACTION:
-        console.log(response.message);
+        // console.log(response.message);
         break;
     }
   });
@@ -297,7 +298,7 @@ export async function depthFirstSearchWorker(roomId: string) {
   // WebSocket 'data' watch
   // ------------------------------------------------------------------
   watch(data, async (value) => {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, WORKERS_DELAY));
 
     if (!value) return;
 
@@ -306,11 +307,11 @@ export async function depthFirstSearchWorker(roomId: string) {
 
     switch (type) {
       case TypeResponseEnum.NEW_PLAYER:
-        console.log('NEW_PLAYER');
+        // console.log('NEW_PLAYER');
         break;
 
       case TypeResponseEnum.YOUR_PLAYER: {
-        console.log('YOUR_PLAYER', response);
+        // console.log('YOUR_PLAYER', response);
         workerId = response.userId;
 
         const adjacentBlocks = response.adjacentBlocks;
@@ -328,7 +329,7 @@ export async function depthFirstSearchWorker(roomId: string) {
         const bestMove = consumeNextQueue(adjacentBlocks);
 
         if (bestMove === ActionMoveEnum.MOVEMENT_NOT_FOUND || !bestMove) {
-          console.log('Movimento não encontrado. Encerrando...');
+          // console.log('Movimento não encontrado. Encerrando...');
           close();
           return;
         } else {
@@ -338,11 +339,11 @@ export async function depthFirstSearchWorker(roomId: string) {
       }
 
       case TypeResponseEnum.GAME_INFO:
-        console.log('GAME_INFO');
+        // console.log('GAME_INFO');
         break;
 
       case TypeResponseEnum.MOVE_PLAYER: {
-        console.log('MOVE_PLAYER', response);
+        // console.log('MOVE_PLAYER', response);
 
         if (response.userId !== workerId) return;
 
@@ -366,7 +367,7 @@ export async function depthFirstSearchWorker(roomId: string) {
         const bestMove = consumeNextQueue(adjacentBlocks);
 
         if (bestMove === ActionMoveEnum.MOVEMENT_NOT_FOUND || !bestMove) {
-          console.log('Movimento não encontrado. Encerrando...');
+          // console.log('Movimento não encontrado. Encerrando...');
           close();
           return;
         } else {
@@ -376,15 +377,15 @@ export async function depthFirstSearchWorker(roomId: string) {
       }
 
       case TypeResponseEnum.REMOVE_PLAYER:
-        console.log('REMOVE_PLAYER');
+        // console.log('REMOVE_PLAYER');
         break;
 
       case TypeResponseEnum.BOARD_INFO:
-        console.log('BOARD_INFO');
+        // console.log('BOARD_INFO');
         break;
 
       case TypeResponseEnum.INVALID_ACTION:
-        console.log(response.message);
+        // console.log(response.message);
         break;
     }
   });
@@ -441,7 +442,7 @@ export async function greedyWorker(roomId: string) {
   // WebSocket 'data' watch
   // ------------------------------------------------------------------
   watch(data, async (value) => {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, WORKERS_DELAY));
 
     if (!value) return;
 
@@ -450,11 +451,11 @@ export async function greedyWorker(roomId: string) {
 
     switch (type) {
       case TypeResponseEnum.NEW_PLAYER:
-        console.log('NEW_PLAYER');
+        // console.log('NEW_PLAYER');
         break;
 
       case TypeResponseEnum.YOUR_PLAYER: {
-        console.log('YOUR_PLAYER', response);
+        // console.log('YOUR_PLAYER', response);
         workerId = response.userId;
 
         send(ActionMoveEnum.GET_BOARD_INFO);
@@ -463,11 +464,11 @@ export async function greedyWorker(roomId: string) {
       }
 
       case TypeResponseEnum.GAME_INFO:
-        console.log('GAME_INFO');
+        // console.log('GAME_INFO');
         break;
 
       case TypeResponseEnum.MOVE_PLAYER: {
-        console.log('MOVE_PLAYER', response);
+        // console.log('MOVE_PLAYER', response);
 
         if (response.userId !== workerId) return;
 
@@ -485,12 +486,12 @@ export async function greedyWorker(roomId: string) {
 
         visit({ block: currentBlock, adjacentBlocks });
 
-        console.log(adjacentBlocks)
+        // console.log(adjacentBlocks)
 
         const bestMove = findBestMoveTo(adjacentBlocks);
 
         if (bestMove === ActionMoveEnum.MOVEMENT_NOT_FOUND || !bestMove) {
-          console.log('Movimento não encontrado. Encerrando...');
+          // console.log('Movimento não encontrado. Encerrando...');
           close();
           return;
         } else {
@@ -500,18 +501,18 @@ export async function greedyWorker(roomId: string) {
       }
 
       case TypeResponseEnum.REMOVE_PLAYER:
-        console.log('REMOVE_PLAYER');
+        // console.log('REMOVE_PLAYER');
         break;
 
       case TypeResponseEnum.BOARD_INFO:
-        console.log('BOARD_INFO');
+        // console.log('BOARD_INFO');
 
         send(ActionMoveEnum.TOP);
 
         break;
 
       case TypeResponseEnum.INVALID_ACTION:
-        console.log(response.message);
+        // console.log(response.message);
         break;
     }
   });
@@ -580,7 +581,7 @@ export async function aStarWorker(roomId: string) {
   // WebSocket 'data' watch
   // ------------------------------------------------------------------
   watch(data, async (value) => {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, WORKERS_DELAY));
 
     if (!value) return;
 
@@ -589,11 +590,11 @@ export async function aStarWorker(roomId: string) {
 
     switch (type) {
       case TypeResponseEnum.NEW_PLAYER:
-        console.log('NEW_PLAYER');
+        // console.log('NEW_PLAYER');
         break;
 
       case TypeResponseEnum.YOUR_PLAYER: {
-        console.log('YOUR_PLAYER', response);
+        // console.log('YOUR_PLAYER', response);
         workerId = response.userId;
 
         send(ActionMoveEnum.GET_BOARD_INFO);
@@ -602,11 +603,11 @@ export async function aStarWorker(roomId: string) {
       }
 
       case TypeResponseEnum.GAME_INFO:
-        console.log('GAME_INFO');
+        // console.log('GAME_INFO');
         break;
 
       case TypeResponseEnum.MOVE_PLAYER: {
-        console.log('MOVE_PLAYER', response);
+        // console.log('MOVE_PLAYER', response);
 
         if (response.userId !== workerId) return;
 
@@ -624,12 +625,12 @@ export async function aStarWorker(roomId: string) {
 
         visit({ block: currentBlock, adjacentBlocks });
 
-        console.log(adjacentBlocks)
+        // console.log(adjacentBlocks)
 
         const bestMove = findBestMoveTo(currentBlock, adjacentBlocks);
 
         if (bestMove === ActionMoveEnum.MOVEMENT_NOT_FOUND || !bestMove) {
-          console.log('Movimento não encontrado. Encerrando...');
+          // console.log('Movimento não encontrado. Encerrando...');
           close();
           return;
         } else {
@@ -639,18 +640,18 @@ export async function aStarWorker(roomId: string) {
       }
 
       case TypeResponseEnum.REMOVE_PLAYER:
-        console.log('REMOVE_PLAYER');
+        // console.log('REMOVE_PLAYER');
         break;
 
       case TypeResponseEnum.BOARD_INFO:
-        console.log('BOARD_INFO');
+        // console.log('BOARD_INFO');
 
         send(ActionMoveEnum.TOP);
 
         break;
 
       case TypeResponseEnum.INVALID_ACTION:
-        console.log(response.message);
+        // console.log(response.message);
         break;
     }
   });

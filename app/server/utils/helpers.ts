@@ -73,7 +73,8 @@ const getCostByBlockType = (block: GameBlockTypeEnum): number => {
 
 function generateBlock(x: number, y: number): IBlock {
   // possibility of generating a blocked block is 3%
-  const isBlocked = Math.random() < 0.03;
+  // const isBlocked = Math.random() < 0.03; // for while is disabled
+  const isBlocked = false;
 
   // points are generated randomly between 10, 20, 30 and 50
   // the probability of generating any of these values is 5%
