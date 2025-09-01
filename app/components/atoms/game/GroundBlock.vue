@@ -33,6 +33,7 @@
     >
       <span> C:{{ heuristic.cost }}</span>
       <div>G:{{ heuristic.distanceAtGoal }}</div>
+      <div>H:{{ heuristic.distanceAtGoal + heuristic.cost }}</div>
     </div>
     <div v-if="debug" class="z-[1] flex flex-col gap-1 text-white">
       <span>X:{{ position.x }}</span>
